@@ -1,0 +1,4 @@
+.env
+.aws/
+credentials
+__pycache__/

@@ -4,7 +4,7 @@
     {
       "name": "verso",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "5178", "--directory", "D:/Model/VERSO"],
+      "runtimeArgs": ["server.py"],
       "port": 5178
     }
   ]

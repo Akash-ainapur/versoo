@@ -375,6 +375,14 @@ function parseBrief(text){
   });
   return out;
 }
+/* The AI version: server.py sends the brief to OpenRouter and returns
+   the same {text, kind, terms} shape. parseBrief stays as the fallback. */
+async function aiChecklist(text){
+  const r = await fetch('api/checklist', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({brief: text})});
+  const data = await r.json().catch(() => ({}));
+  if(!r.ok) throw new Error(data.error || 'HTTP ' + r.status);
+  return {items: data.items.map(it => ({id: uid('i'), text: it.text, kind: it.kind, terms: it.terms || []})), builtBy: data.model || 'ai'};
+}
 function titleOf(text){
   const first = (text || '').split(/\r?\n/).map(s => s.trim()).find(Boolean) || '';
   return BULLET.test(first) || first.length > 80 ? 'Untitled campaign' : first;
@@ -594,7 +602,7 @@ function viewChecklist(){
   }).join('');
   return `
     <h1>Checklist</h1>
-    <p class="lede">${plural(c.items.length, 'line')} from the brief. The automatic check looks for the terms under each line, so edit them to change what it looks for.</p>
+    <p class="lede">${plural(c.items.length, 'line')} from the brief${c.builtBy && c.builtBy !== 'simple' ? ', read by AI' : c.builtBy === 'simple' ? ', read by the simple parser because the AI wasn\'t reachable' : ''}. The automatic check looks for the terms under each line, so edit them to change what it looks for.</p>
     ${groups || '<p class="hint" style="margin-top:24px">Every line was removed. Rebuild from the brief to start again.</p>'}
     <div class="actions"><a class="go" href="#creators">${S.creators.length ? 'Creators' : 'Next, add creators'} <span class="arr">→</span></a></div>`;
 }
@@ -909,10 +917,14 @@ document.addEventListener('click', async e => {
   if(act === 'sample'){ UI.draftBrief = SAMPLE; render(); }
   if(act === 'build'){
     const text = document.getElementById('brief').value;
-    const items = parseBrief(text);
-    if(!items.length){ UI.draftBrief = text; UI.buildWarn = text.trim() ? 'Couldn\'t find any requirements. Put each one on its own line, ideally starting with a dash.' : 'Paste a brief first.'; render(); return; }
+    if(!text.trim()){ UI.buildWarn = 'Paste a brief first.'; render(); return; }
+    b.disabled = true; b.innerHTML = 'Reading the brief<span class="dots"></span>';
+    let items, builtBy;
+    try{ ({items, builtBy} = await aiChecklist(text)); }
+    catch(err){ console.warn('AI checklist unavailable, using the simple parser:', err.message); items = parseBrief(text); builtBy = 'simple'; }
+    if(!items.length){ UI.draftBrief = text; UI.buildWarn = 'Couldn\'t find any requirements. Put each one on its own line, ideally starting with a dash.'; render(); return; }
     UI.buildWarn = ''; UI.draftBrief = null;
-    S.campaign = {id: (S.campaign && S.campaign.id) || uid('c'), title: titleOf(text), brief: text, items, createdAt: (S.campaign && S.campaign.createdAt) || Date.now()};
+    S.campaign = {id: (S.campaign && S.campaign.id) || uid('c'), title: titleOf(text), brief: text, items, builtBy, createdAt: (S.campaign && S.campaign.createdAt) || Date.now()};
     await saveCampaign(); location.hash = '#checklist';
   }
   if(act === 'rmterm'){ const it = item(id); it.terms.splice(+b.dataset.i, 1); await saveCampaign(); UI.refocus = `.addterm[data-id="${id}"]`; render(); }
