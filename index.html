@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FAF7F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#171513" media="(prefers-color-scheme: dark)">
+<title>Reel Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAF7F1; --field:#FDFBF7; --ink:#1A1714; --soft:#6B6358; --faint:#A0968A;
+  --line:#E8E2D7; --line2:#D6CEC1;
+  --pass:#2E6A48; --miss:#A5432C; --unsure:#8A6912; --manual:#5E574E; --change:#3C4E8E;
+  --frame:#1A1714;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#171513; --field:#1D1A17; --ink:#EDE7DC; --soft:#A69D91; --faint:#71685E;
+    --line:#2A2622; --line2:#3A342E;
+    --pass:#7CBD96; --miss:#E48C73; --unsure:#D8B558; --manual:#BDB4A7; --change:#9FB0EA;
+    --frame:#000;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#171513; --field:#1D1A17; --ink:#EDE7DC; --soft:#A69D91; --faint:#71685E;
+  --line:#2A2622; --line2:#3A342E;
+  --pass:#7CBD96; --miss:#E48C73; --unsure:#D8B558; --manual:#BDB4A7; --change:#9FB0EA;
+  --frame:#000;
+}
+
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:'Geist',ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  font-size:15px; line-height:1.55; font-feature-settings:"tnum" 1;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--ink); color:var(--bg)}
+a{color:inherit}
+button{font:inherit; color:inherit; background:none; border:0; padding:0; cursor:pointer}
+:focus-visible{outline:2px solid var(--ink); outline-offset:3px; border-radius:3px}
+
+.wrap{max-width:640px; margin:0 auto; padding:0 20px calc(64px + env(safe-area-inset-bottom))}
+.wrap.wide{max-width:1040px}
+
+/* ---------- top ---------- */
+.top{display:flex; align-items:baseline; gap:12px; padding:22px 0 0; min-width:0}
+.mark-word{font-weight:600; font-size:15px; letter-spacing:-0.01em; text-decoration:none; white-space:nowrap}
+.camp{color:var(--soft); font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0}
+.steps{display:flex; gap:22px; margin:18px 0 0; padding-bottom:12px; border-bottom:1px solid var(--line); overflow-x:auto; scrollbar-width:none}
+.steps::-webkit-scrollbar{display:none}
+.steps a{
+  text-decoration:none; color:var(--soft); font-size:14px; white-space:nowrap;
+  padding:4px 0; position:relative; display:inline-flex; align-items:center; gap:6px;
+}
+.steps a:hover{color:var(--ink)}
+.steps a[aria-current]{color:var(--ink); font-weight:500}
+.steps a[aria-current]::after{content:''; position:absolute; left:0; right:0; bottom:-13px; height:1.5px; background:var(--ink)}
+.n{font-size:12px; color:var(--faint); font-weight:400}
+.n.hot{color:var(--miss); font-weight:500; display:inline-flex; align-items:center; gap:4px}
+.n.hot::before{content:''; width:6px; height:6px; border-radius:50%; background:var(--miss)}
+
+/* ---------- type ---------- */
+h1{font-size:28px; line-height:1.18; font-weight:500; letter-spacing:-0.025em; margin:44px 0 10px; text-wrap:balance}
+h1 em{font-style:normal}
+.c-miss{color:var(--miss)} .c-pass{color:var(--pass)} .c-unsure{color:var(--unsure)} .c-change{color:var(--change)}
+.kicker{font-size:13px; color:var(--soft); margin:44px 0 -34px}
+.lede{color:var(--soft); margin:0 0 8px; max-width:56ch; text-wrap:pretty}
+.label{
+  font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:.08em;
+  color:var(--soft); margin:44px 0 4px; display:flex; align-items:baseline; gap:8px;
+}
+.label .n{letter-spacing:0}
+.hint{color:var(--faint); font-size:13.5px; margin:0 0 10px; max-width:56ch}
+
+/* ---------- actions ---------- */
+.actions{display:flex; flex-wrap:wrap; align-items:center; gap:8px 24px; margin-top:32px}
+.go{
+  font-size:15.5px; font-weight:500; padding:8px 0 6px; text-decoration:none;
+  display:inline-flex; align-items:center; gap:8px; color:var(--ink);
+  background:linear-gradient(currentColor,currentColor) left bottom / 100% 1px no-repeat;
+  transition:background-size .18s ease;
+}
+.go:has(.arr){background-size:calc(100% - 22px) 1px}
+.go:hover{background-size:100% 1px}
+.go .arr{display:inline-block; transition:transform .18s ease}
+.go:hover .arr{transform:translateX(3px)}
+.go:disabled{color:var(--faint); cursor:default}
+.link{
+  font-size:14px; color:var(--soft); text-decoration:underline; text-decoration-color:var(--line2);
+  text-underline-offset:4px; padding:6px 0;
+}
+.link:hover{color:var(--ink); text-decoration-color:var(--ink)}
+.note{font-size:13px; color:var(--faint)}
+.warn{font-size:13.5px; color:var(--miss); margin:14px 0 0}
+
+/* ---------- fields ---------- */
+textarea, input[type=text]{
+  width:100%; font:inherit; font-size:15px; color:var(--ink);
+  background:var(--field); border:1px solid var(--line); border-radius:8px;
+  padding:12px 14px; transition:border-color .15s;
+}
+textarea{line-height:1.6; resize:none; min-height:96px; display:block}
+textarea::placeholder, input::placeholder{color:var(--faint)}
+textarea:focus, input[type=text]:focus{outline:none; border-color:var(--ink)}
+textarea.page{min-height:300px; font-size:14.5px}
+.sample{margin:10px 0 0}
+textarea:not(:placeholder-shown) + .sample{display:none}
+
+/* ---------- checklist lines ---------- */
+.lines{list-style:none; margin:10px 0 0; padding:0; border-bottom:1px solid var(--line)}
+.lines > li{display:grid; grid-template-columns:22px 1fr; gap:14px; padding:16px 0; border-top:1px solid var(--line)}
+.lines.plain > li{grid-template-columns:1fr}
+.req{margin:0; font-size:15px; text-wrap:pretty}
+.ev{margin:5px 0 0; font-size:13.5px; color:var(--soft)}
+.vlabel{font-weight:600; margin-right:6px}
+.v-pass .vlabel{color:var(--pass)} .v-miss .vlabel{color:var(--miss)} .v-unsure .vlabel{color:var(--unsure)}
+.v-ticked .vlabel{color:var(--manual)} .v-unticked .vlabel{color:var(--faint)} .v-change .vlabel{color:var(--change)}
+.was{color:var(--faint)}
+
+.vm{width:22px; height:22px; border-radius:50%; display:grid; place-items:center; margin-top:0; position:relative}
+.vm svg{width:14px; height:14px}
+.v-pass .vm{background:var(--pass); color:var(--bg)}
+.v-miss .vm{box-shadow:inset 0 0 0 1.5px var(--miss); color:var(--miss)}
+.v-unsure .vm{border:1.5px dashed var(--unsure); color:var(--unsure)}
+.v-ticked .vm{border-radius:6px; background:var(--manual); color:var(--bg)}
+.v-unticked .vm{border-radius:6px; border:1.5px dashed var(--faint)}
+.v-change .vm{background:var(--change); color:var(--bg)}
+.pending .vm::after{content:''; width:6px; height:6px; border-radius:50%; background:var(--faint)}
+.pending .req{color:var(--soft)}
+
+@media (prefers-reduced-motion:no-preference){
+  .pending .vm::after{animation:breathe 1.3s ease-in-out infinite}
+  .landed .vm{animation:land .42s cubic-bezier(.2,.9,.3,1.3) both}
+  .landed .ev{animation:rise .3s ease both .08s}
+  .landed .req{transition:color .3s}
+  .dots::after{content:''; animation:dots 1.4s steps(4) infinite}
+}
+@keyframes breathe{50%{opacity:.3; transform:scale(.7)}}
+@keyframes land{0%{transform:scale(.3); opacity:0} 100%{transform:scale(1); opacity:1}}
+@keyframes rise{from{opacity:0; transform:translateY(3px)} to{opacity:1; transform:none}}
+@keyframes dots{0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'}}
+
+/* ---------- checklist editing ---------- */
+.terms{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; align-items:center}
+.term{
+  font-size:13px; display:inline-flex; align-items:center; gap:2px;
+  border:1px solid var(--line2); border-radius:999px; padding:2px 4px 2px 10px; line-height:1.5;
+}
+.term button{width:20px; height:20px; border-radius:50%; color:var(--faint); font-size:15px; line-height:1}
+.term button:hover{color:var(--miss)}
+.addterm{
+  font:inherit; font-size:13px; color:var(--ink); background:none; border:0;
+  border-bottom:1px dashed var(--line2); padding:3px 2px; width:96px; border-radius:0;
+}
+.addterm:focus{outline:none; border-bottom-color:var(--ink); border-bottom-style:solid; width:160px}
+.noterms{font-size:13px; color:var(--unsure)}
+.tools{display:flex; flex-wrap:wrap; gap:4px 18px; margin-top:8px; align-items:center; font-size:13px; color:var(--faint)}
+.tools .link{font-size:13px; padding:4px 0}
+.kind select{
+  font:inherit; font-size:13px; color:var(--soft); background:none; border:0; padding:4px 16px 4px 0;
+  -webkit-appearance:none; appearance:none; cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);
+  background-position:right 5px top 55%, right 1px top 55%; background-size:4px 4px; background-repeat:no-repeat;
+  text-decoration:underline; text-decoration-color:var(--line2); text-underline-offset:4px;
+}
+
+/* ---------- creators ---------- */
+.add{display:flex; gap:16px; align-items:center; margin-top:24px}
+.add input{flex:1; min-width:0}
+.person{grid-template-columns:1fr auto !important; align-items:center}
+.who{font-weight:500; font-size:15.5px}
+.st{font-size:13.5px; color:var(--soft); display:flex; align-items:center; gap:7px; margin-top:2px}
+.dot{width:7px; height:7px; border-radius:50%; background:var(--line2); flex:none}
+.st-review .dot{background:var(--miss)} .st-changes .dot{background:var(--change)} .st-approved .dot{background:var(--pass)}
+.st-review{color:var(--ink)}
+.row-acts{display:flex; gap:16px; align-items:center; flex-wrap:wrap; justify-content:flex-end}
+.row-acts .link{font-size:13.5px}
+.row-acts .go{font-size:14px; padding:6px 0}
+.tally{display:inline-flex; gap:10px; font-size:12.5px; color:var(--soft); margin-top:4px}
+.tally span{display:inline-flex; align-items:center; gap:4px}
+.tally i{width:8px; height:8px; border-radius:50%; display:inline-block}
+.tally .tp i{background:var(--pass)} .tally .tm i{box-shadow:inset 0 0 0 1.5px var(--miss)}
+.tally .tu i{border:1.5px dashed var(--unsure)} .tally .tc i{background:var(--change)}
+
+/* ---------- empty ---------- */
+.empty h1{margin-top:64px}
+
+/* ---------- review ---------- */
+.back{display:inline-block; margin-top:28px; font-size:14px}
+.rv-head{display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:8px 20px}
+.rv-head h1{margin-top:14px; margin-bottom:4px}
+.versions{display:flex; gap:4px; font-size:13.5px}
+.versions a{text-decoration:none; color:var(--soft); padding:4px 10px; border-radius:999px; border:1px solid transparent}
+.versions a[aria-current]{color:var(--ink); border-color:var(--line2)}
+.decided{font-size:14px; color:var(--soft); margin:0}
+.rv{display:grid; gap:32px; margin-top:24px}
+@media (min-width:860px){
+  .rv{grid-template-columns:minmax(300px,380px) 1fr; gap:56px; align-items:start}
+  .media{position:sticky; top:20px}
+}
+.frame{
+  width:min(100%, calc(76vh * 9 / 16)); aspect-ratio:9/16; margin:0 auto;
+  background:var(--frame); border-radius:16px; overflow:hidden; position:relative;
+  display:grid; place-items:center;
+}
+.frame video{width:100%; height:100%; object-fit:contain; display:block; background:#000}
+.frame .nofile{color:#b9b0a4; font-size:13.5px; text-align:center; padding:24px; line-height:1.5}
+.said{margin:24px 0 0}
+.said dt{font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:.08em; color:var(--soft); margin-top:18px}
+.said dd{margin:4px 0 0; font-size:14.5px; white-space:pre-wrap; overflow-wrap:anywhere}
+.said dd.clamp{display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden}
+.said .none{color:var(--faint); font-style:italic}
+.rv .lines{margin-top:0}
+.ask{margin-top:12px; border-left:2px solid var(--change); padding:2px 0 2px 12px}
+.ask .k{font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:.08em; color:var(--change)}
+.ask p{margin:2px 0 0; font-size:14.5px}
+.askform{margin-top:12px}
+.askform textarea{min-height:76px; font-size:14px}
+.askform .actions{margin-top:6px; gap:4px 20px}
+.askform .go{font-size:14px}
+.ov{display:inline-flex; gap:10px; align-items:center}
+.ov button{color:var(--soft); text-decoration:underline; text-decoration-color:var(--line2); text-underline-offset:4px; padding:4px 0}
+.ov button:hover{color:var(--ink)}
+.dock{
+  position:sticky; bottom:0; margin-top:32px; background:var(--bg);
+  border-top:1px solid var(--ink); padding:12px 0 calc(12px + env(safe-area-inset-bottom));
+  display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; z-index:2;
+}
+.dock span{font-size:14px; color:var(--soft)}
+
+/* ---------- creator ---------- */
+.changes{margin-top:36px}
+.changes .label{margin-top:0; color:var(--change)}
+.changes .lines{border-bottom-color:var(--line)}
+.brief-peek{margin-top:26px; border-top:1px solid var(--line); border-bottom:1px solid var(--line)}
+.brief-peek summary{cursor:pointer; padding:12px 0; font-size:14px; color:var(--soft); list-style:none; display:flex; justify-content:space-between}
+.brief-peek summary::-webkit-details-marker{display:none}
+.brief-peek summary::after{content:'+'; color:var(--faint); font-size:17px; line-height:1}
+.brief-peek[open] summary::after{content:'–'}
+.brief-peek ol{margin:0 0 14px; padding-left:20px; font-size:14px; color:var(--soft)}
+.brief-peek li{margin:6px 0}
+.brief-peek li small{color:var(--faint)}
+.pick{
+  width:min(100%, 240px); aspect-ratio:9/16; margin:12px 0 0;
+  border:1.5px dashed var(--line2); border-radius:16px; display:grid; place-content:center;
+  text-align:center; gap:4px; cursor:pointer; transition:border-color .15s, background .15s;
+}
+.pick:hover{border-color:var(--ink); background:var(--field)}
+.pick:focus-within{border-color:var(--ink)}
+.pick b{font-weight:500; font-size:15px}
+.pick small{color:var(--faint); font-size:12.5px}
+.picked{margin:12px 0 0; width:min(100%, 240px); margin-left:0}
+.fileline{font-size:13px; color:var(--faint); margin-top:8px; display:flex; gap:14px; align-items:center; flex-wrap:wrap}
+.sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+.tick{display:grid; grid-template-columns:22px 1fr; gap:14px; padding:13px 0; border-top:1px solid var(--line); cursor:pointer; font-size:15px; position:relative}
+.ticks{border-bottom:1px solid var(--line); margin-top:10px}
+.box{width:22px; height:22px; border-radius:6px; border:1.5px solid var(--line2); display:grid; place-items:center; color:transparent; transition:all .15s}
+.box svg{width:14px; height:14px}
+.tick:hover .box{border-color:var(--ink)}
+.tick input:checked + .box{background:var(--ink); border-color:var(--ink); color:var(--bg)}
+.tick input:focus-visible + .box{outline:2px solid var(--ink); outline-offset:3px}
+.history{list-style:none; padding:0; margin:10px 0 0; border-bottom:1px solid var(--line)}
+.history li{display:grid; grid-template-columns:40px 1fr auto; gap:12px; padding:12px 0; border-top:1px solid var(--line); font-size:14px; align-items:baseline}
+.history .vn{font-weight:600}
+.history .when{color:var(--faint); font-size:13px}
+
+/* ---------- footer, toast ---------- */
+footer{margin-top:72px; padding-top:16px; border-top:1px solid var(--line); font-size:12.5px; color:var(--faint); line-height:1.6}
+footer .link{font-size:12.5px; color:var(--faint); padding:0}
+.toast{
+  position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom)); transform:translate(-50%, 12px);
+  background:var(--ink); color:var(--bg); font-size:13.5px; padding:9px 16px; border-radius:999px;
+  opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; z-index:9; white-space:nowrap;
+}
+.toast.show{opacity:1; transform:translate(-50%, 0)}
+
+@media (max-width:480px){
+  h1{font-size:25px; margin-top:36px}
+  .kicker{margin-top:36px; margin-bottom:-28px}
+  .label{margin-top:36px}
+  .person{grid-template-columns:1fr !important}
+  .row-acts{justify-content:flex-start}
+  .add{flex-direction:column; align-items:stretch; gap:6px}
+  .add .go{align-self:flex-start}
+}
+</style>
+</head>
+<body>
+<div id="app" class="wrap"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =====================================================================
+   Reel Check, frontend.
+   Swap points for the AWS build (see build-plan.md):
+     parseBrief()  -> Bedrock, Step D
+     runCheck()    -> Bedrock, Step D
+     api           -> API Gateway + Lambda + DynamoDB, Step A
+     vids          -> presigned S3 upload, Step B
+   Everything else stays as it is.
+   ===================================================================== */
+
+const SAMPLE = `invideo Editor: Effects Library
+
+What your video should show
+- The finished edit or effect.
+- The footage or reference you started with.
+- The direction or prompt you gave the agent, and the work it performed.
+- The editable timeline and any refinements you made.
+
+What should land
+- invideo has launched invideo Editor. You can sign up and start using it for free.
+- Tell its agents what editing work you want done. They handle the repetitive steps directly on your timeline.
+- You can keep directing the agent or refine the result with manual controls.
+
+Working with the agent
+- Use your own footage where possible.
+- Use invideo Editor agents in Ultra mode.
+
+CTA and publishing
+- CTA: invideo Editor is free to use. Sign up and start creating.
+- Comment "invideo" to get access to invideo Editor and my project timeline.
+- Tag and add as collaborators: @invideo.io and @invideo.creators`;
+
+/* ---------------------------------------------------------------------
+   parseBrief: brief text -> checklist items {id, text, kind, terms[]}
+   kind is one of caption | speech | manual
+   --------------------------------------------------------------------- */
+const STOP = new Set(('the a an and or to of in on for your you with it its is are that this they them can keep make give any own from at by as into their was were be been have has do does did get got how what which when use used using also more most each every all not no one two my our we i he she his her if then than so up out about just like want will would should could may might must shall ' +
+  'tell say says mention show shows showing start started done work handle directly steps where possible video there here make sure include').split(' '));
+const BULLET = /^\s*(?:[-•●▪*–]|\d+[.)])\s+/;
+
+function kindFromLine(line){
+  const l = line.toLowerCase();
+  if(/[@#][a-z0-9._]/i.test(line) || /\b(caption|tag|tags|comment|collaborators?|hashtags?|description)\b/.test(l)) return 'caption';
+  if(/\b(say|says|tell|mention|sign ?up|free|launched|launch|cta|voiceover|voice-over|explain|talk|call out)\b/.test(l)) return 'speech';
+  return null;
+}
+function kindFromHeading(h){
+  const l = (h || '').toLowerCase();
+  if(/\b(show|visual|on screen|footage|shot|shots|b-roll)\b/.test(l)) return 'manual';
+  if(/\b(caption|publish|publishing|posting|tags?)\b/.test(l)) return 'caption';
+  if(/\b(land|say|script|voice|message|talking|key points?)\b/.test(l)) return 'speech';
+  return null;
+}
+function termsFor(line, kind){
+  if(kind === 'manual') return [];
+  const handles = line.match(/[@#][a-zA-Z0-9._]*[a-zA-Z0-9_]/g) || [];
+  const quoted = (line.match(/["“]([^"”]+)["”]/g) || []).map(s => s.replace(/["“”]/g,'').toLowerCase());
+  if(handles.length || quoted.length) return [...new Set([...handles.map(h => h.toLowerCase()), ...quoted])];
+  const phrases = [];
+  if(/\bsign[\s-]?up\b/i.test(line)) phrases.push('sign up');
+  const words = line.toLowerCase().replace(/sign[\s-]?up/g,' ').replace(/[^a-z0-9 ]/g,' ').split(/\s+/)
+    .filter(w => w.length > 3 && !STOP.has(w));
+  return [...new Set([...phrases, ...words])].slice(0,5);
+}
+function parseBrief(text){
+  const lines = text.split(/\r?\n/);
+  const hasBullets = lines.some(l => BULLET.test(l));
+  const out = []; let heading = '';
+  lines.forEach((raw, i) => {
+    const t = raw.trim(); if(!t) return;
+    const bulleted = BULLET.test(raw);
+    if(hasBullets && !bulleted){ heading = t; return; }
+    const line = t.replace(BULLET,'').trim();
+    if(line.length < 12 || (!hasBullets && (i === 0 || /:$/.test(line)))){ heading = line; return; }
+    const kind = kindFromLine(line) || kindFromHeading(heading) || 'manual';
+    out.push({id: uid('i'), text: line, kind, terms: termsFor(line, kind)});
+  });
+  return out;
+}
+function titleOf(text){
+  const first = (text || '').split(/\r?\n/).map(s => s.trim()).find(Boolean) || '';
+  return BULLET.test(first) || first.length > 80 ? 'Untitled campaign' : first;
+}
+
+/* ---------------------------------------------------------------------
+   runCheck: one item + one submission -> {verdict, evidence}
+   verdict: pass | miss | unsure | ticked | unticked
+   --------------------------------------------------------------------- */
+const reEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+function found(hay, term){
+  if(/[\s@#]/.test(term)) return hay.includes(term);
+  const stem = term.length > 5 ? term.replace(/(ing|ed|es|s)$/,'') : term;
+  return new RegExp('(^|[^a-z0-9])' + reEsc(stem)).test(hay);
+}
+const q = arr => arr.map(t => '“' + t + '”').join(', ');
+function runCheck(item, sub){
+  if(item.kind === 'manual'){
+    return sub.ticks && sub.ticks[item.id]
+      ? {verdict:'ticked', evidence:'A visual line, confirmed with a tick.'}
+      : {verdict:'unticked', evidence:'A visual line, so it needs a tick once it\'s in the reel.'};
+  }
+  const where = item.kind === 'caption' ? 'the caption' : 'the script';
+  const hay = ((item.kind === 'caption' ? sub.caption : sub.script) || '').toLowerCase().replace(/\s+/g,' ');
+  const terms = (item.terms || []).map(t => t.toLowerCase().trim()).filter(Boolean);
+  if(!hay.trim()) return {verdict:'miss', evidence: item.kind === 'caption' ? 'The caption is empty.' : 'No script to check against yet.'};
+  if(!terms.length) return {verdict:'unsure', evidence:'No terms to look for, so this needs a human eye.'};
+  const hit = terms.filter(t => found(hay, t)), gone = terms.filter(t => !found(hay, t));
+  if(!gone.length) return {verdict:'pass', evidence:`Found ${q(hit)} in ${where}.`};
+  if(item.kind === 'caption') return {verdict:'miss', evidence:`Not in the caption yet: ${q(gone)}.`};
+  if(hit.length) return {verdict:'unsure', evidence:`Found ${q(hit)} but not ${q(gone)}. It may just be worded differently.`};
+  return {verdict:'miss', evidence:`None of ${q(terms)} came up in the script.`};
+}
+function checkAll(sub){
+  const r = {}; (S.campaign ? S.campaign.items : []).forEach(it => r[it.id] = runCheck(it, sub)); return r;
+}
+
+/* ---------------------------------------------------------------------
+   api: the four Step A endpoints. Local storage today; set
+   window.REELCHECK_API to an API Gateway URL to go remote.
+   --------------------------------------------------------------------- */
+const KEY = 'reelcheck.v2';
+const API_BASE = window.REELCHECK_API || '';
+const blank = () => ({campaign:null, creators:[], subs:{}});
+function readLocal(){ try{ const r = localStorage.getItem(KEY); if(r) return JSON.parse(r); }catch(e){} return blank(); }
+function writeLocal(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+let S = readLocal();
+
+const localApi = {
+  async load(){ S = readLocal(); },
+  async saveCampaign(c){ S.campaign = c; writeLocal(); },
+  async registerCreator(name){ const c = {id:uid('u'), name, addedAt:Date.now()}; S.creators.push(c); writeLocal(); return c; },
+  async submit(cid, v){ (S.subs[cid] = S.subs[cid] || {versions:[]}).versions.push(v); writeLocal(); },
+  async review(cid, n, review){ const v = version(cid, n); if(v){ v.review = review; writeLocal(); } },
+  async reset(){ S = blank(); writeLocal(); }
+};
+async function call(method, path, body){
+  const r = await fetch(API_BASE + path, {method, headers:{'Content-Type':'application/json'}, body: body ? JSON.stringify(body) : undefined});
+  if(!r.ok) throw new Error(method + ' ' + path + ' ' + r.status);
+  return r.status === 204 ? null : r.json();
+}
+const remoteApi = {
+  async load(id){ id = id || (S.campaign && S.campaign.id); if(id) S = await call('GET', `/campaigns/${id}`); },
+  async saveCampaign(c){ await call('PUT', `/campaigns/${c.id}`, c); S.campaign = c; },
+  async registerCreator(name){ const c = await call('POST', `/campaigns/${S.campaign.id}/creators`, {name}); S.creators.push(c); return c; },
+  async submit(cid, v){ await call('POST', `/campaigns/${S.campaign.id}/creators/${cid}/submissions`, v); (S.subs[cid] = S.subs[cid] || {versions:[]}).versions.push(v); },
+  async review(cid, n, review){ await call('PUT', `/campaigns/${S.campaign.id}/creators/${cid}/submissions/${n}/review`, review); const v = version(cid, n); if(v) v.review = review; },
+  async reset(){ S = blank(); }
+};
+const api = API_BASE ? remoteApi : localApi;
+
+/* ---------------------------------------------------------------------
+   vids: reel files. IndexedDB on this device today, so the brand's
+   tab can play what the creator's tab uploaded. Step B swaps in S3.
+   --------------------------------------------------------------------- */
+const vids = (() => {
+  let p; const urls = {};
+  const db = () => p = p || new Promise((res, rej) => {
+    const r = indexedDB.open('reelcheck', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('videos');
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+  return {
+    async put(key, blob, url){
+      if(url) urls[key] = url;
+      try{ const d = await db(); await new Promise((res, rej) => { const t = d.transaction('videos','readwrite'); t.objectStore('videos').put(blob, key); t.oncomplete = res; t.onerror = () => rej(t.error); }); }catch(e){}
+    },
+    async url(key){
+      if(urls[key]) return urls[key];
+      try{
+        const d = await db();
+        const blob = await new Promise((res, rej) => { const g = d.transaction('videos').objectStore('videos').get(key); g.onsuccess = () => res(g.result); g.onerror = () => rej(g.error); });
+        return blob ? (urls[key] = URL.createObjectURL(blob)) : null;
+      }catch(e){ return null; }
+    },
+    clear(){ try{ indexedDB.deleteDatabase('reelcheck'); p = null; }catch(e){} }
+  };
+})();
+
+/* ---------------------------------------------------------------------
+   helpers
+   --------------------------------------------------------------------- */
+function uid(p){ return p + Math.random().toString(36).slice(2,8) + Date.now().toString(36).slice(-3); }
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
+const when = t => new Date(t).toLocaleString([], {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+const creator = id => S.creators.find(c => c.id === id);
+const versions = cid => (S.subs[cid] && S.subs[cid].versions) || [];
+const version = (cid, n) => versions(cid).find(v => v.n === n);
+const latest = cid => { const v = versions(cid); return v[v.length - 1]; };
+const item = id => S.campaign && S.campaign.items.find(i => i.id === id);
+
+const svg = p => `<svg viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const ICON = {
+  pass: svg('<path d="M5.5 10.4l3 3 6-6.8"/>'),
+  miss: svg('<path d="M6.8 6.8l6.4 6.4M13.2 6.8l-6.4 6.4"/>'),
+  unsure: svg('<path d="M7.8 7.7a2.3 2.3 0 1 1 3.3 2.1c-.7.3-1.1.8-1.1 1.5v.3"/><path d="M10 14.3h.01" stroke-width="2.8"/>'),
+  ticked: svg('<path d="M5.5 10.4l3 3 6-6.8"/>'),
+  unticked: '',
+  change: svg('<path d="M8.4 5.6L5 9l3.4 3.4"/><path d="M5.6 9H12a3 3 0 0 1 0 6h-1.2"/>')
+};
+const LABEL = {
+  brand:  {pass:'Pass', miss:'Missing', unsure:'Not sure', ticked:'Creator ticked', unticked:'Not ticked', change:'Change asked'},
+  creator:{pass:'There', miss:'To fix', unsure:'Not sure', ticked:'You ticked', unticked:'Not ticked', change:'Change asked'}
+};
+const KIND = {
+  caption:{label:'Checked in the caption', hint:'Looked for word for word in the caption.', pick:'in the caption'},
+  speech: {label:'Checked in what they say', hint:'Looked for in the voiceover or script.', pick:'in what they say'},
+  manual: {label:'Creator ticks', hint:'Visual. The creator confirms it, and you judge it in the reel.', pick:'by the creator'}
+};
+const mark = v => `<span class="vm">${ICON[v] || ''}</span>`;
+const isFix = v => v === 'miss' || v === 'unticked';
+const isOk = v => v === 'pass' || v === 'ticked';
+
+function reviewOf(v){ return v.review || {changes:{}, overrides:{}, decision:null}; }
+function verdictsFor(cid, v){
+  const auto = checkAll(v), rv = reviewOf(v), out = {};
+  Object.keys(auto).forEach(id => out[id] = rv.overrides[id] || auto[id].verdict);
+  return {auto, out, rv};
+}
+function statusOf(cid){
+  const v = latest(cid);
+  if(!v) return {key:'waiting', text:'Waiting for their reel'};
+  const d = v.review && v.review.decision;
+  if(!d) return {key:'review', text:`Version ${v.n} needs your review`};
+  if(d === 'approved') return {key:'approved', text:`Version ${v.n} approved`};
+  return {key:'changes', text:`${plural(Object.keys(v.review.changes).length, 'change')} sent on version ${v.n}`};
+}
+const needsReview = () => S.creators.filter(c => statusOf(c.id).key === 'review');
+function linkFor(cid){
+  const base = location.href.split(/[?#]/)[0];
+  return `${base}?c=${encodeURIComponent(S.campaign ? S.campaign.id : '')}&u=${encodeURIComponent(cid)}`;
+}
+let toastT;
+function toast(msg){
+  const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 1900);
+}
+function tally(verdicts){
+  const vs = Object.values(verdicts);
+  const c = k => vs.filter(k).length;
+  const p = c(isOk), m = c(isFix), u = c(v => v === 'unsure');
+  return `<span class="tally" aria-label="${p} there, ${m} missing, ${u} not sure"><span class="tp"><i></i>${p}</span><span class="tm"><i></i>${m}</span><span class="tu"><i></i>${u}</span></span>`;
+}
+const empty = (title, text, href, cta) =>
+  `<div class="empty"><h1>${title}</h1><p class="lede">${text}</p>${href ? `<div class="actions"><a class="go" href="${href}">${cta} <span class="arr">→</span></a></div>` : ''}</div>`;
+
+/* =====================================================================
+   BRAND
+   ===================================================================== */
+const UI = {draftBrief:null, buildWarn:'', ask:null, refocus:null, more:false};
+
+function defaultRoute(){
+  if(!S.campaign) return 'brief';
+  if(!S.creators.length) return 'creators';
+  return S.creators.some(c => latest(c.id)) ? 'review' : 'creators';
+}
+function brandShell(active, inner){
+  const c = S.campaign, nr = needsReview().length;
+  const tabs = [['brief','Brief'], ['checklist','Checklist', c && c.items.length], ['creators','Creators', S.creators.length], ['review','Review', nr]];
+  return `
+    <header class="top"><a class="mark-word" href="#brief">Reel Check</a>${c ? `<span class="camp">${esc(c.title)}</span>` : ''}</header>
+    <nav class="steps" aria-label="Campaign">${tabs.map(([k, l, n]) =>
+      `<a href="#${k}" ${active === k ? 'aria-current="page"' : ''}>${l}${n ? `<span class="n ${k === 'review' ? 'hot' : ''}">${n}</span>` : ''}</a>`).join('')}</nav>
+    <main>${inner}</main>
+    <footer>Demo build, stored in this browser. The check reads the caption and what's said on camera; anything visual stays with the creator's tick and your eye, and you can override every verdict.
+      <button class="link" data-act="reset">Start over</button></footer>`;
+}
+
+function viewBrief(){
+  const b = UI.draftBrief != null ? UI.draftBrief : (S.campaign ? S.campaign.brief : '');
+  return `
+    <h1>Campaign brief</h1>
+    <p class="lede">Paste the brief you send creators. Every line they have to act on becomes a checklist item.</p>
+    <div style="margin-top:24px">
+      <textarea id="brief" class="page" placeholder="Paste your brief here. One requirement per line works best." aria-label="Campaign brief" spellcheck="false">${esc(b)}</textarea>
+      <p class="sample"><button class="link" data-act="sample">Or use the invideo sample brief</button></p>
+    </div>
+    ${UI.buildWarn ? `<p class="warn">${UI.buildWarn}</p>` : ''}
+    <div class="actions">
+      <button class="go" data-act="build">${S.campaign ? 'Rebuild checklist' : 'Build checklist'} <span class="arr">→</span></button>
+      ${S.campaign ? `<span class="note">Rebuilding replaces the checklist. Creators keep their links.</span>` : ''}
+    </div>`;
+}
+
+function viewChecklist(){
+  const c = S.campaign;
+  if(!c) return empty('No checklist yet', 'Paste a brief and the checklist builds itself from it.', '#brief', 'Go to the brief');
+  const groups = ['caption','speech','manual'].map(k => {
+    const items = c.items.filter(i => i.kind === k);
+    if(!items.length) return '';
+    return `<section>
+      <h2 class="label">${KIND[k].label}<span class="n">${items.length}</span></h2>
+      <p class="hint">${KIND[k].hint}</p>
+      <ol class="lines plain">${items.map(itemEditor).join('')}</ol>
+    </section>`;
+  }).join('');
+  return `
+    <h1>Checklist</h1>
+    <p class="lede">${plural(c.items.length, 'line')} from the brief. The automatic check looks for the terms under each line, so edit them to change what it looks for.</p>
+    ${groups || '<p class="hint" style="margin-top:24px">Every line was removed. Rebuild from the brief to start again.</p>'}
+    <div class="actions"><a class="go" href="#creators">${S.creators.length ? 'Creators' : 'Next, add creators'} <span class="arr">→</span></a></div>`;
+}
+function itemEditor(it){
+  const opts = ['caption','speech','manual'].map(k => `<option value="${k}" ${it.kind === k ? 'selected' : ''}>Checked ${KIND[k].pick}</option>`).join('');
+  return `<li data-id="${it.id}">
+    <p class="req">${esc(it.text)}</p>
+    ${it.kind === 'manual' ? '' : `<div class="terms" role="group" aria-label="Terms the check looks for">
+      ${it.terms.map((t, i) => `<span class="term">${esc(t)}<button data-act="rmterm" data-id="${it.id}" data-i="${i}" aria-label="Stop looking for ${esc(t)}">×</button></span>`).join('')}
+      ${it.terms.length ? '' : '<span class="noterms">No terms, so this comes back as not sure.</span>'}
+      <input class="addterm" data-id="${it.id}" placeholder="+ add term" aria-label="Add a term" autocomplete="off">
+    </div>`}
+    <div class="tools">
+      <label class="kind"><span class="sr">How this line is checked</span><select data-act="kind" data-id="${it.id}">${opts}</select></label>
+      <button class="link" data-act="rmitem" data-id="${it.id}">Remove line</button>
+    </div>
+  </li>`;
+}
+
+function viewCreators(){
+  if(!S.campaign) return empty('Build a checklist first', 'Creators get a link to a campaign, so the campaign comes first.', '#brief', 'Go to the brief');
+  const rows = S.creators.map(c => {
+    const st = statusOf(c.id), v = latest(c.id);
+    return `<li class="person">
+      <div>
+        <div class="who">${esc(c.name)}</div>
+        <div class="st st-${st.key}"><span class="dot"></span>${st.text}</div>
+        ${v ? tally(verdictsFor(c.id, v).out) : ''}
+      </div>
+      <div class="row-acts">
+        <button class="link" data-act="copy" data-id="${c.id}">Copy link</button>
+        <a class="link" href="${esc(linkFor(c.id))}" target="_blank" rel="noopener">Open link ↗</a>
+        ${v ? `<a class="go" href="#review/${c.id}">Review <span class="arr">→</span></a>` : ''}
+      </div>
+    </li>`;
+  }).join('');
+  return `
+    <h1>Creators</h1>
+    <p class="lede">Each creator gets their own link. No account, no password, no invite email. They just open it.</p>
+    <form class="add" data-form="creator" autocomplete="off">
+      <input type="text" id="cname" placeholder="Name or @handle" aria-label="Creator name or handle">
+      <button class="go">Add creator <span class="arr">→</span></button>
+    </form>
+    ${S.creators.length ? `<ol class="lines plain" style="margin-top:28px">${rows}</ol>`
+      : `<p class="hint" style="margin-top:18px">Add the first creator above, then open their link to see what they see.</p>`}`;
+}
+
+function viewReviewList(){
+  if(!S.campaign) return empty('Nothing to review yet', 'Start with the brief. Reels show up here once creators send them.', '#brief', 'Go to the brief');
+  const list = S.creators.filter(c => latest(c.id));
+  if(!list.length) return empty('No reels yet', S.creators.length
+    ? 'Open a creator\'s link and send a reel as them. It lands here, already checked.'
+    : 'Add a creator, open their link, and send a reel as them. It lands here, already checked.', '#creators', 'Creators');
+  const order = {review:0, changes:1, approved:2};
+  list.sort((a, b) => order[statusOf(a.id).key] - order[statusOf(b.id).key]);
+  return `
+    <h1>Review</h1>
+    <p class="lede">Every reel arrives already checked. Open one to watch it, override any verdict, and ask for changes line by line.</p>
+    <ol class="lines plain" style="margin-top:28px">${list.map(c => {
+      const st = statusOf(c.id), v = latest(c.id);
+      return `<li class="person">
+        <div><div class="who">${esc(c.name)}</div><div class="st st-${st.key}"><span class="dot"></span>${st.text}</div>${tally(verdictsFor(c.id, v).out)}</div>
+        <div class="row-acts"><a class="go" href="#review/${c.id}">${st.key === 'review' ? 'Review' : 'Open'} <span class="arr">→</span></a></div>
+      </li>`;
+    }).join('')}</ol>`;
+}
+
+function viewReview(cid, nSel){
+  const c = creator(cid), all = versions(cid);
+  if(!c || !all.length) return empty('Nothing here', 'This creator hasn\'t sent a reel yet.', '#review', 'All reels');
+  const v = (nSel && version(cid, nSel)) || all[all.length - 1];
+  const isLatest = v === all[all.length - 1];
+  const {auto, out, rv} = verdictsFor(cid, v);
+  const editable = isLatest && !rv.decision;
+  const nChanges = Object.keys(rv.changes).length;
+
+  const lines = S.campaign.items.map(it => {
+    const a = auto[it.id], shown = out[it.id], ch = rv.changes[it.id], over = rv.overrides[it.id];
+    const alt = ['pass','miss','unsure'].filter(x => x !== shown);
+    return `<li class="v-${shown}">
+      ${mark(shown)}
+      <div>
+        <p class="req">${esc(it.text)}</p>
+        <p class="ev"><span class="vlabel">${LABEL.brand[shown]}</span>${over ? `<span class="was">You changed this from ${LABEL.brand[a.verdict].toLowerCase()}. </span>` : ''}${esc(a.evidence)}</p>
+        ${ch && UI.ask !== it.id ? `<div class="ask"><span class="k">${editable ? 'You\'re asking' : 'You asked'}</span><p>${esc(ch.note)}</p></div>` : ''}
+        ${editable && UI.ask === it.id ? `<div class="askform">
+            <textarea id="asktext" rows="2" placeholder="What should ${esc(c.name)} change? Say what good looks like." aria-label="Change request">${esc(ch ? ch.note : '')}</textarea>
+            <div class="actions"><button class="go" data-act="asksave" data-id="${it.id}">Save</button><button class="link" data-act="askcancel">Cancel</button>${ch ? `<button class="link" data-act="askremove" data-id="${it.id}">Remove request</button>` : ''}</div>
+          </div>` : ''}
+        ${editable && UI.ask !== it.id ? `<div class="tools">
+            <button class="link" data-act="askopen" data-id="${it.id}">${ch ? 'Edit request' : 'Ask for a change'}</button>
+            <span class="ov">Mark ${alt.map(x => `<button data-act="ov" data-id="${it.id}" data-v="${x}">${LABEL.brand[x].toLowerCase()}</button>`).join('')}${over ? `<button data-act="ov" data-id="${it.id}" data-v="">undo</button>` : ''}</span>
+          </div>` : ''}
+      </div>
+    </li>`;
+  }).join('');
+
+  const decided = rv.decision
+    ? `<p class="decided">${rv.decision === 'approved' ? `<span class="c-pass">You approved version ${v.n}</span>` : `<span class="c-change">You sent ${plural(nChanges, 'change')}</span>`} · ${when(rv.at)}</p>`
+    : `<p class="decided">Version ${v.n} · sent ${when(v.sentAt)}</p>`;
+
+  return `
+    <a class="link back" href="#review">← All reels</a>
+    <div class="rv-head">
+      <h1>${esc(c.name)}</h1>
+      ${all.length > 1 ? `<nav class="versions" aria-label="Versions">${all.map(x => `<a href="#review/${cid}/${x.n}" ${x === v ? 'aria-current="true"' : ''}>v${x.n}</a>`).join('')}</nav>` : ''}
+    </div>
+    ${decided}
+    <div class="rv">
+      <div class="media">
+        <div class="frame" data-video="${cid}#${v.n}"><span class="nofile">${v.hasVideo ? 'Loading the reel' : 'No video file came with this version.'}</span></div>
+        <dl class="said">
+          <dt>Caption</dt><dd>${v.caption ? esc(v.caption) : '<span class="none">No caption</span>'}</dd>
+          <dt>Said on camera</dt><dd class="${UI.more ? '' : 'clamp'}">${v.script ? esc(v.script) : '<span class="none">Nothing pasted</span>'}</dd>
+        </dl>
+        ${v.script && v.script.length > 240 ? `<button class="link" data-act="more">${UI.more ? 'Show less' : 'Show all'}</button>` : ''}
+      </div>
+      <div>
+        <h2 class="label" style="margin-top:0">Checklist ${tally(out)}</h2>
+        <ol class="lines">${lines}</ol>
+        ${editable ? `<div class="dock">
+          <span>${nChanges ? `${plural(nChanges, 'change')} for ${esc(c.name)}` : 'No changes asked for'}</span>
+          <button class="go" data-act="sendreview" data-id="${cid}" data-n="${v.n}">${nChanges ? 'Send changes' : `Approve version ${v.n}`} <span class="arr">→</span></button>
+        </div>` : ''}
+      </div>
+    </div>`;
+}
+
+/* =====================================================================
+   CREATOR
+   ===================================================================== */
+const P = new URLSearchParams(location.search);
+const CID = P.get('u'), CAMP = P.get('c');
+const CR = {screen:null, draft:null, results:null, n:null, timer:null, warn:''};
+
+function creatorDefault(){
+  const v = latest(CID);
+  if(!v) return 'form';
+  const d = v.review && v.review.decision;
+  return d === 'changes' ? 'form' : 'sent';
+}
+function ensureDraft(){
+  if(CR.draft) return;
+  const v = latest(CID);
+  CR.draft = {caption: v ? v.caption : '', script: v ? v.script : '', ticks: v ? {...v.ticks} : {}, file:null, url:null};
+}
+function creatorShell(inner){
+  const c = creator(CID);
+  return `<header class="top"><span class="mark-word">Reel Check</span>${c ? `<span class="camp">for ${esc(c.name)}</span>` : ''}</header>
+    <main>${inner}</main>`;
+}
+function creatorView(){
+  const c = creator(CID);
+  if(!S.campaign || !c || (CAMP && S.campaign.id !== CAMP))
+    return creatorShell(empty('This link isn\'t set up here', 'For now, links only work in the same browser the brand set the campaign up in. Ask the brand to open it from their creator list.'));
+  if(!CR.screen) CR.screen = creatorDefault();
+  if(CR.screen === 'checking') return creatorShell(viewChecking());
+  if(CR.screen === 'result') return creatorShell(viewResult());
+  if(CR.screen === 'sent') return creatorShell(viewSent());
+  return creatorShell(viewForm());
+}
+
+function viewForm(){
+  ensureDraft();
+  const d = CR.draft, v = latest(CID), items = S.campaign.items;
+  const asked = v && v.review && v.review.decision === 'changes' ? Object.entries(v.review.changes) : [];
+  const next = v ? v.n + 1 : 1;
+  const manual = items.filter(i => i.kind === 'manual');
+  return `
+    <p class="kicker">${v ? `Version ${next}` : 'Your assignment'}</p>
+    <h1>${esc(S.campaign.title)}</h1>
+    ${asked.length ? `<section class="changes">
+      <h2 class="label">The brand asked for ${plural(asked.length, 'change')}</h2>
+      <p class="hint">On version ${v.n}. Fix ${asked.length === 1 ? 'this' : 'these'}, then send version ${next}.</p>
+      <ol class="lines">${asked.map(([id, ch]) => `<li class="v-change">${mark('change')}<div><p class="req">${esc(ch.note)}</p><p class="ev">On: ${esc((item(id) || ch).text)}</p></div></li>`).join('')}</ol>
+    </section>` : `<p class="lede">Send your reel, caption and script. It gets checked against the brief right away, and you see the result before the brand does.</p>`}
+
+    <details class="brief-peek"><summary>What the brand is looking for · ${plural(items.length, 'line')}</summary>
+      <ol>${items.map(i => `<li>${esc(i.text)} <small>· ${KIND[i.kind].pick.replace('they say','you say').replace('by the creator','you tick it')}</small></li>`).join('')}</ol>
+    </details>
+
+    <h2 class="label">Your reel</h2>
+    ${d.url ? `<div class="frame picked"><video src="${d.url}" controls playsinline></video></div>
+      <div class="fileline"><span>${esc(d.file.name)}</span><label class="link" style="cursor:pointer">Choose a different file<input type="file" accept="video/*" class="sr" data-act="file"></label></div>`
+    : `<label class="pick"><input type="file" accept="video/*" class="sr" data-act="file"><b>Choose your reel</b><small>Portrait video, from your phone or computer</small></label>`}
+
+    <h2 class="label">Caption</h2>
+    <p class="hint">Paste it exactly as you'll post it. Tags and handles are checked word for word.</p>
+    <textarea id="cap" rows="3" data-draft="caption" placeholder="Your caption, tags included" aria-label="Caption">${esc(d.caption)}</textarea>
+
+    <h2 class="label">What you say on camera</h2>
+    <p class="hint">Paste your voiceover or script. The spoken points are checked against it.</p>
+    <textarea id="scr" rows="5" data-draft="script" placeholder="Everything you say in the reel" aria-label="What you say on camera">${esc(d.script)}</textarea>
+
+    ${manual.length ? `<h2 class="label">In the video</h2>
+      <p class="hint">Tick only what's really in the reel. The brand checks these by eye.</p>
+      <div class="ticks">${manual.map(i => `<label class="tick"><input type="checkbox" class="sr" data-act="tick" data-id="${i.id}" ${d.ticks[i.id] ? 'checked' : ''}><span class="box">${ICON.pass}</span><span>${esc(i.text)}</span></label>`).join('')}</div>` : ''}
+
+    ${CR.warn ? `<p class="warn">${CR.warn}</p>` : ''}
+    <div class="actions">
+      <button class="go" data-act="check">Check my reel <span class="arr">→</span></button>
+      <span class="note">Nothing goes to the brand until you send it.</span>
+    </div>`;
+}
+
+function viewChecking(){
+  return `
+    <p class="kicker">Version ${CR.n}</p>
+    <h1>Checking your reel<span class="dots" aria-hidden="true"></span></h1>
+    <p class="lede">Reading your caption and what you say on camera against ${plural(S.campaign.items.length, 'line')} of the brief.</p>
+    <ol class="lines live" aria-live="polite">${S.campaign.items.map(it => `<li class="pending" data-id="${it.id}">${mark('')}<div><p class="req">${esc(it.text)}</p><p class="ev"></p></div></li>`).join('')}</ol>`;
+}
+function startChecking(){
+  const d = CR.draft;
+  if(!d.url && !d.caption.trim() && !d.script.trim()){ CR.warn = 'Add your reel, caption or script first, so there\'s something to check.'; render(); return; }
+  CR.warn = '';
+  const v = latest(CID); CR.n = v ? v.n + 1 : 1;
+  CR.results = checkAll(d); CR.screen = 'checking'; render(); scrollTo(0, 0);
+  const lis = [...document.querySelectorAll('.live > li')];
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const first = calm ? 150 : 900, step = calm ? 30 : 240;
+  lis.forEach((li, i) => setTimeout(() => {
+    const r = CR.results[li.dataset.id]; if(!r) return;
+    li.className = 'v-' + r.verdict + ' landed';
+    li.querySelector('.vm').innerHTML = ICON[r.verdict] || '';
+    li.querySelector('.ev').innerHTML = `<span class="vlabel">${LABEL.creator[r.verdict]}</span>${esc(r.evidence)}`;
+    if(!calm) li.scrollIntoView({block:'nearest', behavior:'smooth'});
+  }, first + i * step));
+  clearTimeout(CR.timer);
+  CR.timer = setTimeout(() => { CR.screen = 'result'; render(); scrollTo(0, 0); }, first + lis.length * step + 1000);
+}
+
+function viewResult(){
+  const r = CR.results, vs = Object.values(r).map(x => x.verdict);
+  const fix = vs.filter(isFix).length, uns = vs.filter(v => v === 'unsure').length, ok = vs.filter(isOk).length;
+  const head = fix ? `<em class="c-miss">${plural(fix, 'thing')}</em> to fix`
+    : uns ? `Nearly there, <em class="c-unsure">${uns} to double-check</em>`
+    : `Everything <em class="c-pass">checks out</em>`;
+  const lede = `${ok} of ${vs.length} lines are there.` +
+    (uns ? ` ${uns === 1 ? 'One line' : uns + ' lines'} might just be worded differently, and the brand will judge ${uns === 1 ? 'it' : 'those'}.` : '') +
+    (fix ? ' Fix what\'s missing and check again, or send it as it is.' : ' Send it when you\'re ready.');
+  const rank = v => isFix(v) ? 0 : v === 'unsure' ? 1 : 2;
+  const items = [...S.campaign.items].sort((a, b) => rank(r[a.id].verdict) - rank(r[b.id].verdict));
+  return `
+    <p class="kicker">Version ${CR.n} · checked, not sent yet</p>
+    <h1>${head}</h1>
+    <p class="lede">${lede}</p>
+    <ol class="lines" style="margin-top:28px">${items.map(it => { const x = r[it.id]; return `<li class="v-${x.verdict}">${mark(x.verdict)}<div><p class="req">${esc(it.text)}</p><p class="ev"><span class="vlabel">${LABEL.creator[x.verdict]}</span>${esc(x.evidence)}</p></div></li>`; }).join('')}</ol>
+    ${CR.draft.url ? '' : '<p class="warn">No video attached. The brand will only see your caption and script.</p>'}
+    <div class="actions">
+      <button class="go" data-act="send">Send version ${CR.n} to the brand <span class="arr">→</span></button>
+      <button class="link" data-act="edit">Edit and check again</button>
+    </div>`;
+}
+
+function viewSent(){
+  const v = latest(CID), all = versions(CID).slice().reverse();
+  const approved = v.review && v.review.decision === 'approved';
+  return `
+    <p class="kicker">${approved ? 'Approved' : 'Sent'}</p>
+    <h1>${approved ? `Version ${v.n} is <em class="c-pass">approved</em>` : `Version ${v.n} is with the brand`}</h1>
+    <p class="lede">${approved ? 'Nothing else to do here. Thanks for the reel.' : 'Their notes will show up on this same link, attached to the exact line they\'re about. Keep it handy.'}</p>
+    <h2 class="label">History</h2>
+    <ol class="history">${all.map(x => {
+      const d = x.review && x.review.decision;
+      const st = d === 'approved' ? '<span class="c-pass">Approved</span>'
+        : d === 'changes' ? `<span class="c-change">${plural(Object.keys(x.review.changes).length, 'change')} asked</span>`
+        : x === v ? 'Waiting for the brand' : '<span class="note">Replaced by a newer version</span>';
+      return `<li><span class="vn">v${x.n}</span><span>${st}</span><span class="when">${when(x.sentAt)}</span></li>`;
+    }).join('')}</ol>
+    ${approved ? '' : `<div class="actions"><button class="link" data-act="newversion">Send a new version instead</button></div>`}`;
+}
+
+/* =====================================================================
+   render + events
+   ===================================================================== */
+const MODE_CREATOR = !!CID;
+function render(){
+  const app = document.getElementById('app');
+  if(MODE_CREATOR){
+    app.className = 'wrap';
+    app.innerHTML = creatorView();
+  } else {
+    const [r, a, b] = location.hash.slice(1).split('/');
+    const active = ['brief','checklist','creators','review'].includes(r) ? r : defaultRoute();
+    const inner = active === 'brief' ? viewBrief()
+      : active === 'checklist' ? viewChecklist()
+      : active === 'creators' ? viewCreators()
+      : a ? viewReview(a, b ? +b : null) : viewReviewList();
+    app.className = 'wrap' + (active === 'review' && a ? ' wide' : '');
+    app.innerHTML = brandShell(active, inner);
+  }
+  hydrate();
+}
+function grow(t){ t.style.height = 'auto'; t.style.height = (t.scrollHeight + 2) + 'px'; }
+function hydrate(){
+  document.querySelectorAll('textarea').forEach(grow);
+  document.querySelectorAll('[data-video]').forEach(async f => {
+    const url = await vids.url(f.dataset.video);
+    if(url) f.innerHTML = `<video src="${url}" controls playsinline preload="metadata"></video>`;
+    else if(f.querySelector('.nofile') && /Loading/.test(f.textContent)) f.querySelector('.nofile').textContent = 'The video file isn\'t on this device.';
+  });
+  if(UI.refocus){ const el = document.querySelector(UI.refocus); if(el) el.focus(); UI.refocus = null; }
+}
+
+async function saveCampaign(){ S.campaign.updatedAt = Date.now(); await api.saveCampaign(S.campaign); }
+
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-act]'); if(!b || b.tagName === 'INPUT' || b.tagName === 'SELECT') return;
+  const act = b.dataset.act, id = b.dataset.id;
+
+  if(act === 'sample'){ UI.draftBrief = SAMPLE; render(); }
+  if(act === 'build'){
+    const text = document.getElementById('brief').value;
+    const items = parseBrief(text);
+    if(!items.length){ UI.draftBrief = text; UI.buildWarn = text.trim() ? 'Couldn\'t find any requirements. Put each one on its own line, ideally starting with a dash.' : 'Paste a brief first.'; render(); return; }
+    UI.buildWarn = ''; UI.draftBrief = null;
+    S.campaign = {id: (S.campaign && S.campaign.id) || uid('c'), title: titleOf(text), brief: text, items, createdAt: (S.campaign && S.campaign.createdAt) || Date.now()};
+    await saveCampaign(); location.hash = '#checklist';
+  }
+  if(act === 'rmterm'){ const it = item(id); it.terms.splice(+b.dataset.i, 1); await saveCampaign(); UI.refocus = `.addterm[data-id="${id}"]`; render(); }
+  if(act === 'rmitem'){ S.campaign.items = S.campaign.items.filter(i => i.id !== id); await saveCampaign(); render(); toast('Line removed'); }
+  if(act === 'copy'){
+    const url = linkFor(id);
+    try{ await navigator.clipboard.writeText(url); toast('Link copied'); }
+    catch(err){ prompt('Copy this link', url); }
+  }
+  if(act === 'reset'){
+    if(!confirm('Start over? This clears the campaign, creators and reels saved in this browser.')) return;
+    await api.reset(); vids.clear(); UI.draftBrief = null; location.hash = '#brief'; render();
+  }
+  if(act === 'more'){ UI.more = !UI.more; render(); }
+
+  // review
+  const [, rcid, rn] = location.hash.slice(1).split('/');
+  const rv = () => { const v = version(rcid, rn ? +rn : latest(rcid).n); v.review = v.review || {changes:{}, overrides:{}, decision:null}; return v; };
+  if(act === 'askopen'){ UI.ask = id; render(); UI.refocus = '#asktext'; hydrate(); }
+  if(act === 'askcancel'){ UI.ask = null; render(); }
+  if(act === 'asksave' || act === 'askremove'){
+    const v = rv(), note = act === 'asksave' ? document.getElementById('asktext').value.trim() : '';
+    if(note) v.review.changes[id] = {note, text: item(id).text}; else delete v.review.changes[id];
+    UI.ask = null; await api.review(rcid, v.n, v.review); render();
+  }
+  if(act === 'ov'){
+    const v = rv();
+    if(b.dataset.v) v.review.overrides[id] = b.dataset.v; else delete v.review.overrides[id];
+    await api.review(rcid, v.n, v.review); render();
+  }
+  if(act === 'sendreview'){
+    const v = rv(), k = Object.keys(v.review.changes).length;
+    v.review.decision = k ? 'changes' : 'approved'; v.review.at = Date.now();
+    await api.review(b.dataset.id, v.n, v.review); render();
+    toast(k ? `Sent to ${creator(b.dataset.id).name}` : `Version ${v.n} approved`);
+  }
+
+  // creator
+  if(act === 'check') startChecking();
+  if(act === 'edit'){ CR.screen = 'form'; render(); scrollTo(0, 0); }
+  if(act === 'newversion'){ CR.draft = null; CR.screen = 'form'; render(); scrollTo(0, 0); }
+  if(act === 'send'){
+    const d = CR.draft;
+    b.disabled = true;
+    if(d.file) await vids.put(`${CID}#${CR.n}`, d.file, d.url);
+    await api.submit(CID, {n: CR.n, caption: d.caption, script: d.script, ticks: {...d.ticks}, hasVideo: !!d.file, sentAt: Date.now()});
+    CR.draft = null; CR.screen = 'sent'; render(); scrollTo(0, 0);
+  }
+});
+
+document.addEventListener('input', e => {
+  const t = e.target;
+  if(t.tagName === 'TEXTAREA') grow(t);
+  if(t.id === 'brief') UI.draftBrief = t.value;
+  if(t.dataset.draft && CR.draft) CR.draft[t.dataset.draft] = t.value;
+});
+document.addEventListener('change', async e => {
+  const t = e.target, act = t.dataset.act;
+  if(act === 'kind'){ const it = item(t.dataset.id); it.kind = t.value; if(t.value !== 'manual' && !it.terms.length) it.terms = termsFor(it.text, t.value); await saveCampaign(); render(); }
+  if(act === 'tick' && CR.draft) CR.draft.ticks[t.dataset.id] = t.checked;
+  if(act === 'file'){
+    const f = t.files[0]; if(!f) return;
+    if(CR.draft.url) URL.revokeObjectURL(CR.draft.url);
+    CR.draft.file = f; CR.draft.url = URL.createObjectURL(f); CR.warn = ''; render();
+  }
+});
+document.addEventListener('keydown', async e => {
+  const t = e.target;
+  if(t.classList && t.classList.contains('addterm')){
+    if(e.key === 'Enter' || e.key === ','){
+      e.preventDefault();
+      const it = item(t.dataset.id), vals = t.value.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+      if(!vals.length) return;
+      it.terms = [...new Set([...it.terms, ...vals])];
+      await saveCampaign(); UI.refocus = `.addterm[data-id="${it.id}"]`; render();
+    }
+    if(e.key === 'Backspace' && !t.value){
+      const it = item(t.dataset.id); if(!it.terms.length) return;
+      it.terms.pop(); await saveCampaign(); UI.refocus = `.addterm[data-id="${it.id}"]`; render();
+    }
+  }
+  if(e.key === 'Escape' && UI.ask){ UI.ask = null; render(); }
+});
+document.addEventListener('submit', async e => {
+  if(e.target.dataset.form !== 'creator') return;
+  e.preventDefault();
+  const inp = document.getElementById('cname'), name = inp.value.trim();
+  if(!name){ inp.focus(); return; }
+  await api.registerCreator(name); UI.refocus = '#cname'; render(); toast(`${name} added`);
+});
+addEventListener('hashchange', () => { UI.ask = null; UI.more = false; render(); scrollTo(0, 0); });
+
+/* Other tabs (the creator's link, the brand's screen) write to the same
+   storage. Pick up their changes live, but never under someone's cursor. */
+let stale = false;
+function refresh(){
+  const a = document.activeElement;
+  if(a && /^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName) || UI.ask || CR.screen === 'checking'){ stale = true; return; }
+  stale = false;
+  api.load(CAMP).then(() => {
+    if(MODE_CREATOR && CR.screen === 'sent') CR.screen = creatorDefault();
+    const y = scrollY; render(); scrollTo(0, y);
+  });
+}
+addEventListener('storage', e => { if(e.key === KEY) refresh(); });
+document.addEventListener('focusout', () => setTimeout(() => { if(stale) refresh(); }, 0));
+
+api.load(CAMP).then(render, () => render());
+</script>
+</body>
+</html>
