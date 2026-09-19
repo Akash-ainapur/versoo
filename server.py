@@ -1,6 +1,6 @@
 """Reel Check local server.
 
-Serves index.html and runs api/checklist.py, the same function Vercel runs.
+Serves index.html and runs api/ai.py, the same function Vercel runs.
 The API key stays in .env and never reaches the browser.
 
     python server.py        ->  http://localhost:5178
@@ -19,7 +19,7 @@ if env.exists():
             k, v = line.split("=", 1)
             os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
 
-from api.checklist import model, respond  # noqa: E402  (after .env is loaded)
+from api.ai import model, respond  # noqa: E402  (after .env is loaded)
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -27,7 +27,7 @@ class Handler(SimpleHTTPRequestHandler):
         super().__init__(*a, directory=str(ROOT), **kw)
 
     def do_POST(self):
-        if self.path == "/api/checklist":
+        if self.path == "/api/ai":
             return respond(self)
         self.send_error(404)
 

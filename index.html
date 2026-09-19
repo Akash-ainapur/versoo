@@ -3,32 +3,42 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#FAF7F1" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#171513" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F5F2EC" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141210" media="(prefers-color-scheme: dark)">
 <title>Reel Check</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#FAF7F1; --field:#FDFBF7; --ink:#1A1714; --soft:#6B6358; --faint:#A0968A;
-  --line:#E8E2D7; --line2:#D6CEC1;
-  --pass:#2E6A48; --miss:#A5432C; --unsure:#8A6912; --manual:#5E574E; --change:#3C4E8E;
-  --frame:#1A1714;
+  --bg:#F5F2EC; --surface:#FFFDF9; --sunken:#EFEBE4; --hover:#F3EFE8;
+  --ink:#1A1714; --ink2:#5C554C; --ink3:#968C7F;
+  --border:#E6DFD4; --border2:#D3CABC;
+  --met:#2D7A4D; --met-bg:#E4F0E6; --miss:#B2432D; --miss-bg:#F8E6E1;
+  --unc:#946A0C; --unc-bg:#F6EDD3; --req:#3A53A5; --req-bg:#E6EAF7; --wait:#776E63; --wait-bg:#ECE8E1;
+  --shadow:0 1px 2px rgba(40,30,20,.04), 0 6px 20px rgba(40,30,20,.05);
+  --pop:0 2px 6px rgba(40,30,20,.06), 0 16px 40px rgba(40,30,20,.14);
+  --panel:#1A1714; --panel-ink:#F5F2EC; --panel-soft:#A89F93;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#171513; --field:#1D1A17; --ink:#EDE7DC; --soft:#A69D91; --faint:#71685E;
-    --line:#2A2622; --line2:#3A342E;
-    --pass:#7CBD96; --miss:#E48C73; --unsure:#D8B558; --manual:#BDB4A7; --change:#9FB0EA;
-    --frame:#000;
+    --bg:#131110; --surface:#1B1816; --sunken:#221F1C; --hover:#24211D;
+    --ink:#EFE9DF; --ink2:#B0A698; --ink3:#7B7166;
+    --border:#2C2824; --border2:#3C362F;
+    --met:#7CC59A; --met-bg:#1C2A21; --miss:#EF8F77; --miss-bg:#34211C;
+    --unc:#E0BA5E; --unc-bg:#302816; --req:#9FB1F2; --req-bg:#1F253A; --wait:#A79D90; --wait-bg:#262320;
+    --shadow:0 1px 2px rgba(0,0,0,.3); --pop:0 16px 40px rgba(0,0,0,.5);
+    --panel:#0C0B0A; --panel-ink:#EFE9DF; --panel-soft:#8F867A;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#171513; --field:#1D1A17; --ink:#EDE7DC; --soft:#A69D91; --faint:#71685E;
-  --line:#2A2622; --line2:#3A342E;
-  --pass:#7CBD96; --miss:#E48C73; --unsure:#D8B558; --manual:#BDB4A7; --change:#9FB0EA;
-  --frame:#000;
+  --bg:#131110; --surface:#1B1816; --sunken:#221F1C; --hover:#24211D;
+  --ink:#EFE9DF; --ink2:#B0A698; --ink3:#7B7166;
+  --border:#2C2824; --border2:#3C362F;
+  --met:#7CC59A; --met-bg:#1C2A21; --miss:#EF8F77; --miss-bg:#34211C;
+  --unc:#E0BA5E; --unc-bg:#302816; --req:#9FB1F2; --req-bg:#1F253A; --wait:#A79D90; --wait-bg:#262320;
+  --shadow:0 1px 2px rgba(0,0,0,.3); --pop:0 16px 40px rgba(0,0,0,.5);
+  --panel:#0C0B0A; --panel-ink:#EFE9DF; --panel-soft:#8F867A;
 }
 
 *{box-sizing:border-box}
@@ -37,273 +47,433 @@ html{-webkit-text-size-adjust:100%}
 body{
   margin:0; background:var(--bg); color:var(--ink);
   font-family:'Geist',ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-  font-size:15px; line-height:1.55; font-feature-settings:"tnum" 1;
-  -webkit-font-smoothing:antialiased;
+  font-size:14.5px; line-height:1.5; -webkit-font-smoothing:antialiased;
 }
 ::selection{background:var(--ink); color:var(--bg)}
 a{color:inherit}
 button{font:inherit; color:inherit; background:none; border:0; padding:0; cursor:pointer}
-:focus-visible{outline:2px solid var(--ink); outline-offset:3px; border-radius:3px}
+:focus-visible{outline:2px solid var(--ink); outline-offset:2px; border-radius:6px}
+h1,h2,h3,p{margin:0}
+svg{flex:none}
+.sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
 
-.wrap{max-width:640px; margin:0 auto; padding:0 20px calc(64px + env(safe-area-inset-bottom))}
-.wrap.wide{max-width:1040px}
-
-/* ---------- top ---------- */
-.top{display:flex; align-items:baseline; gap:12px; padding:22px 0 0; min-width:0}
-.mark-word{font-weight:600; font-size:15px; letter-spacing:-0.01em; text-decoration:none; white-space:nowrap}
-.camp{color:var(--soft); font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0}
-.steps{display:flex; gap:22px; margin:18px 0 0; padding-bottom:12px; border-bottom:1px solid var(--line); overflow-x:auto; scrollbar-width:none}
-.steps::-webkit-scrollbar{display:none}
-.steps a{
-  text-decoration:none; color:var(--soft); font-size:14px; white-space:nowrap;
-  padding:4px 0; position:relative; display:inline-flex; align-items:center; gap:6px;
+/* ---------- primitives ---------- */
+.i{width:18px; height:18px}
+.i-sm{width:15px; height:15px}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px; height:40px; padding:0 16px;
+  border-radius:10px; font-size:14px; font-weight:500; white-space:nowrap; text-decoration:none;
+  border:1px solid var(--border2); background:var(--surface); color:var(--ink);
+  transition:background .15s, border-color .15s, opacity .15s, transform .1s;
 }
-.steps a:hover{color:var(--ink)}
-.steps a[aria-current]{color:var(--ink); font-weight:500}
-.steps a[aria-current]::after{content:''; position:absolute; left:0; right:0; bottom:-13px; height:1.5px; background:var(--ink)}
-.n{font-size:12px; color:var(--faint); font-weight:400}
-.n.hot{color:var(--miss); font-weight:500; display:inline-flex; align-items:center; gap:4px}
-.n.hot::before{content:''; width:6px; height:6px; border-radius:50%; background:var(--miss)}
+.btn:hover{background:var(--hover)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--ink); border-color:var(--ink); color:var(--bg)}
+.btn.primary:hover{opacity:.88; background:var(--ink)}
+.btn.ghost{border-color:transparent; background:transparent; color:var(--ink2)}
+.btn.ghost:hover{background:var(--sunken); color:var(--ink)}
+.btn.sm{height:32px; padding:0 12px; font-size:13px; border-radius:8px}
+.btn.lg{height:46px; padding:0 22px; font-size:15px; border-radius:12px}
+.btn:disabled{opacity:.5; cursor:default; transform:none}
+.icon-btn{width:32px; height:32px; border-radius:8px; display:inline-grid; place-items:center; color:var(--ink2)}
+.icon-btn:hover{background:var(--sunken); color:var(--ink)}
 
-/* ---------- type ---------- */
-h1{font-size:28px; line-height:1.18; font-weight:500; letter-spacing:-0.025em; margin:44px 0 10px; text-wrap:balance}
-h1 em{font-style:normal}
-.c-miss{color:var(--miss)} .c-pass{color:var(--pass)} .c-unsure{color:var(--unsure)} .c-change{color:var(--change)}
-.kicker{font-size:13px; color:var(--soft); margin:44px 0 -34px}
-.lede{color:var(--soft); margin:0 0 8px; max-width:56ch; text-wrap:pretty}
-.label{
-  font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:.08em;
-  color:var(--soft); margin:44px 0 4px; display:flex; align-items:baseline; gap:8px;
+.input, textarea.input{
+  width:100%; font:inherit; font-size:14.5px; color:var(--ink); background:var(--surface);
+  border:1px solid var(--border2); border-radius:10px; padding:10px 12px; transition:border-color .15s, box-shadow .15s;
 }
-.label .n{letter-spacing:0}
-.hint{color:var(--faint); font-size:13.5px; margin:0 0 10px; max-width:56ch}
+textarea.input{resize:none; line-height:1.6; min-height:88px; display:block}
+.input::placeholder{color:var(--ink3)}
+.input:focus{outline:none; border-color:var(--ink); box-shadow:0 0 0 3px color-mix(in srgb, var(--ink) 10%, transparent)}
 
-/* ---------- actions ---------- */
-.actions{display:flex; flex-wrap:wrap; align-items:center; gap:8px 24px; margin-top:32px}
-.go{
-  font-size:15.5px; font-weight:500; padding:8px 0 6px; text-decoration:none;
-  display:inline-flex; align-items:center; gap:8px; color:var(--ink);
-  background:linear-gradient(currentColor,currentColor) left bottom / 100% 1px no-repeat;
-  transition:background-size .18s ease;
+.card{background:var(--surface); border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow)}
+.card-h{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 20px; border-bottom:1px solid var(--border)}
+.card-h h2, .card-h h3{font-size:15px; font-weight:600}
+.card-b{padding:20px}
+.muted{color:var(--ink2)} .faint{color:var(--ink3)}
+.small{font-size:13px}
+
+.pill{display:inline-flex; align-items:center; gap:6px; height:24px; padding:0 10px 0 8px; border-radius:999px; font-size:12.5px; font-weight:500; white-space:nowrap}
+.pill::before{content:''; width:6px; height:6px; border-radius:50%; background:currentColor}
+.p-waiting{background:var(--wait-bg); color:var(--wait)}
+.p-review{background:var(--unc-bg); color:var(--unc)}
+.p-changes{background:var(--req-bg); color:var(--req)}
+.p-approved{background:var(--met-bg); color:var(--met)}
+
+.si{width:24px; height:24px; border-radius:50%; display:grid; place-items:center; flex:none}
+.si svg{width:14px; height:14px}
+.si-pass{background:var(--met-bg); color:var(--met)}
+.si-miss{background:var(--miss-bg); color:var(--miss)}
+.si-unsure{background:var(--unc-bg); color:var(--unc)}
+.si-pending{background:var(--sunken)}
+.si-pending::after{content:''; width:6px; height:6px; border-radius:50%; background:var(--ink3)}
+
+.kind-tag{display:inline-flex; align-items:center; gap:5px; font-size:12px; color:var(--ink3); font-weight:500}
+.kind-tag svg{width:13px; height:13px}
+
+/* menus */
+.menu{position:relative}
+.menu > summary{list-style:none}
+.menu > summary::-webkit-details-marker{display:none}
+.menu-pop{
+  position:absolute; right:0; top:calc(100% + 6px); min-width:210px; z-index:30;
+  background:var(--surface); border:1px solid var(--border); border-radius:12px; box-shadow:var(--pop); padding:6px;
 }
-.go:has(.arr){background-size:calc(100% - 22px) 1px}
-.go:hover{background-size:100% 1px}
-.go .arr{display:inline-block; transition:transform .18s ease}
-.go:hover .arr{transform:translateX(3px)}
-.go:disabled{color:var(--faint); cursor:default}
-.link{
-  font-size:14px; color:var(--soft); text-decoration:underline; text-decoration-color:var(--line2);
-  text-underline-offset:4px; padding:6px 0;
+.menu-pop button, .menu-pop a{
+  display:flex; align-items:center; gap:10px; width:100%; text-align:left; padding:8px 10px;
+  border-radius:8px; font-size:13.5px; color:var(--ink); text-decoration:none;
 }
-.link:hover{color:var(--ink); text-decoration-color:var(--ink)}
-.note{font-size:13px; color:var(--faint)}
-.warn{font-size:13.5px; color:var(--miss); margin:14px 0 0}
+.menu-pop button:hover, .menu-pop a:hover{background:var(--sunken)}
+.menu-pop .danger{color:var(--miss)}
+.menu-pop hr{border:0; border-top:1px solid var(--border); margin:6px 4px}
+.menu-pop .lbl{font-size:11.5px; color:var(--ink3); padding:6px 10px 2px; text-transform:uppercase; letter-spacing:.06em; font-weight:500}
 
-/* ---------- fields ---------- */
-textarea, input[type=text]{
-  width:100%; font:inherit; font-size:15px; color:var(--ink);
-  background:var(--field); border:1px solid var(--line); border-radius:8px;
-  padding:12px 14px; transition:border-color .15s;
+.spin{width:16px; height:16px; border:2px solid currentColor; border-right-color:transparent; border-radius:50%; animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- brand shell ---------- */
+.app{display:grid; grid-template-columns:260px minmax(0,1fr); min-height:100vh}
+.side{
+  position:sticky; top:0; height:100vh; background:var(--surface); border-right:1px solid var(--border);
+  padding:18px 14px; display:flex; flex-direction:column; gap:6px;
 }
-textarea{line-height:1.6; resize:none; min-height:96px; display:block}
-textarea::placeholder, input::placeholder{color:var(--faint)}
-textarea:focus, input[type=text]:focus{outline:none; border-color:var(--ink)}
-textarea.page{min-height:300px; font-size:14.5px}
-.sample{margin:10px 0 0}
-textarea:not(:placeholder-shown) + .sample{display:none}
-
-/* ---------- checklist lines ---------- */
-.lines{list-style:none; margin:10px 0 0; padding:0; border-bottom:1px solid var(--line)}
-.lines > li{display:grid; grid-template-columns:22px 1fr; gap:14px; padding:16px 0; border-top:1px solid var(--line)}
-.lines.plain > li{grid-template-columns:1fr}
-.req{margin:0; font-size:15px; text-wrap:pretty}
-.ev{margin:5px 0 0; font-size:13.5px; color:var(--soft)}
-.vlabel{font-weight:600; margin-right:6px}
-.v-pass .vlabel{color:var(--pass)} .v-miss .vlabel{color:var(--miss)} .v-unsure .vlabel{color:var(--unsure)}
-.v-ticked .vlabel{color:var(--manual)} .v-unticked .vlabel{color:var(--faint)} .v-change .vlabel{color:var(--change)}
-.was{color:var(--faint)}
-
-.vm{width:22px; height:22px; border-radius:50%; display:grid; place-items:center; margin-top:0; position:relative}
-.vm svg{width:14px; height:14px}
-.v-pass .vm{background:var(--pass); color:var(--bg)}
-.v-miss .vm{box-shadow:inset 0 0 0 1.5px var(--miss); color:var(--miss)}
-.v-unsure .vm{border:1.5px dashed var(--unsure); color:var(--unsure)}
-.v-ticked .vm{border-radius:6px; background:var(--manual); color:var(--bg)}
-.v-unticked .vm{border-radius:6px; border:1.5px dashed var(--faint)}
-.v-change .vm{background:var(--change); color:var(--bg)}
-.pending .vm::after{content:''; width:6px; height:6px; border-radius:50%; background:var(--faint)}
-.pending .req{color:var(--soft)}
-
-@media (prefers-reduced-motion:no-preference){
-  .pending .vm::after{animation:breathe 1.3s ease-in-out infinite}
-  .landed .vm{animation:land .42s cubic-bezier(.2,.9,.3,1.3) both}
-  .landed .ev{animation:rise .3s ease both .08s}
-  .landed .req{transition:color .3s}
-  .dots::after{content:''; animation:dots 1.4s steps(4) infinite}
+.logo{display:flex; align-items:center; gap:10px; font-weight:600; font-size:15.5px; letter-spacing:-.01em; padding:2px 8px 16px; text-decoration:none}
+.glyph{width:30px; height:30px; border-radius:9px; background:var(--ink); color:var(--bg); display:grid; place-items:center}
+.glyph svg{width:14px; height:14px}
+.camp-box{margin:0 4px 14px; padding:12px; border-radius:12px; background:var(--sunken)}
+.camp-box .k{font-size:11.5px; color:var(--ink3); text-transform:uppercase; letter-spacing:.06em; font-weight:500}
+.camp-box .t{font-weight:600; font-size:14px; margin-top:2px; line-height:1.35}
+.nav{display:flex; flex-direction:column; gap:2px}
+.nav a{
+  display:flex; align-items:center; gap:10px; height:40px; padding:0 10px; border-radius:10px;
+  color:var(--ink2); text-decoration:none; font-size:14px; font-weight:500;
 }
-@keyframes breathe{50%{opacity:.3; transform:scale(.7)}}
-@keyframes land{0%{transform:scale(.3); opacity:0} 100%{transform:scale(1); opacity:1}}
-@keyframes rise{from{opacity:0; transform:translateY(3px)} to{opacity:1; transform:none}}
-@keyframes dots{0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'}}
+.nav a:hover{background:var(--hover); color:var(--ink)}
+.nav a[aria-current]{background:var(--sunken); color:var(--ink)}
+.nav .badge{margin-left:auto; min-width:22px; height:20px; padding:0 7px; border-radius:999px; background:var(--unc-bg); color:var(--unc); font-size:12px; display:grid; place-items:center; font-weight:600}
+.side-foot{margin-top:auto; padding:12px 8px 0; border-top:1px solid var(--border); font-size:12.5px; color:var(--ink3); line-height:1.5}
+.side-foot button{color:var(--ink2); text-decoration:underline; text-underline-offset:3px; margin-top:6px; font-size:12.5px}
 
-/* ---------- checklist editing ---------- */
-.terms{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; align-items:center}
-.term{
-  font-size:13px; display:inline-flex; align-items:center; gap:2px;
-  border:1px solid var(--line2); border-radius:999px; padding:2px 4px 2px 10px; line-height:1.5;
-}
-.term button{width:20px; height:20px; border-radius:50%; color:var(--faint); font-size:15px; line-height:1}
-.term button:hover{color:var(--miss)}
-.addterm{
-  font:inherit; font-size:13px; color:var(--ink); background:none; border:0;
-  border-bottom:1px dashed var(--line2); padding:3px 2px; width:96px; border-radius:0;
-}
-.addterm:focus{outline:none; border-bottom-color:var(--ink); border-bottom-style:solid; width:160px}
-.noterms{font-size:13px; color:var(--unsure)}
-.tools{display:flex; flex-wrap:wrap; gap:4px 18px; margin-top:8px; align-items:center; font-size:13px; color:var(--faint)}
-.tools .link{font-size:13px; padding:4px 0}
-.kind select{
-  font:inherit; font-size:13px; color:var(--soft); background:none; border:0; padding:4px 16px 4px 0;
-  -webkit-appearance:none; appearance:none; cursor:pointer;
-  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);
-  background-position:right 5px top 55%, right 1px top 55%; background-size:4px 4px; background-repeat:no-repeat;
-  text-decoration:underline; text-decoration-color:var(--line2); text-underline-offset:4px;
-}
+.main{min-width:0}
+.page-head{display:flex; justify-content:space-between; align-items:flex-end; gap:16px 24px; padding:32px 40px 24px; flex-wrap:wrap}
+.page-head h1{font-size:26px; font-weight:600; letter-spacing:-.025em; line-height:1.2; display:flex; align-items:center; gap:12px; flex-wrap:wrap}
+.page-head .sub{color:var(--ink2); margin-top:6px}
+.page-head .acts{display:flex; gap:10px; flex-wrap:wrap}
+.crumb{display:inline-flex; align-items:center; gap:6px; color:var(--ink2); text-decoration:none; font-size:13.5px; margin-bottom:10px}
+.crumb:hover{color:var(--ink)}
+.crumb svg{width:15px; height:15px}
+.content{padding:0 40px 64px}
 
-/* ---------- creators ---------- */
-.add{display:flex; gap:16px; align-items:center; margin-top:24px}
-.add input{flex:1; min-width:0}
-.person{grid-template-columns:1fr auto !important; align-items:center}
-.who{font-weight:500; font-size:15.5px}
-.st{font-size:13.5px; color:var(--soft); display:flex; align-items:center; gap:7px; margin-top:2px}
-.dot{width:7px; height:7px; border-radius:50%; background:var(--line2); flex:none}
-.st-review .dot{background:var(--miss)} .st-changes .dot{background:var(--change)} .st-approved .dot{background:var(--pass)}
-.st-review{color:var(--ink)}
-.row-acts{display:flex; gap:16px; align-items:center; flex-wrap:wrap; justify-content:flex-end}
-.row-acts .link{font-size:13.5px}
-.row-acts .go{font-size:14px; padding:6px 0}
-.tally{display:inline-flex; gap:10px; font-size:12.5px; color:var(--soft); margin-top:4px}
-.tally span{display:inline-flex; align-items:center; gap:4px}
-.tally i{width:8px; height:8px; border-radius:50%; display:inline-block}
-.tally .tp i{background:var(--pass)} .tally .tm i{box-shadow:inset 0 0 0 1.5px var(--miss)}
-.tally .tu i{border:1.5px dashed var(--unsure)} .tally .tc i{background:var(--change)}
+/* stats */
+.stats{display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:14px; margin-bottom:20px}
+.stat{padding:16px 18px}
+.stat .k{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink2)}
+.stat .k i{width:8px; height:8px; border-radius:50%}
+.stat .v{font-size:28px; font-weight:600; letter-spacing:-.02em; margin-top:6px; font-variant-numeric:tabular-nums}
 
-/* ---------- empty ---------- */
-.empty h1{margin-top:64px}
+/* table */
+.tbl{width:100%; border-collapse:collapse}
+.tbl th{font-size:12px; font-weight:500; color:var(--ink3); text-align:left; padding:12px 20px; border-bottom:1px solid var(--border); text-transform:uppercase; letter-spacing:.05em}
+.tbl td{padding:14px 20px; border-bottom:1px solid var(--border); vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tbody tr{transition:background .12s}
+.tbl tbody tr:hover{background:var(--hover)}
+.who{display:flex; align-items:center; gap:12px; font-weight:500}
+.av{width:34px; height:34px; border-radius:50%; display:grid; place-items:center; font-size:12.5px; font-weight:600; color:#1A1714; flex:none}
+.meter{display:flex; gap:2px; width:120px; height:6px; border-radius:99px; overflow:hidden; background:var(--sunken)}
+.meter span{height:100%}
+.meter .m{background:var(--met)} .meter .u{background:var(--unc)} .meter .x{background:var(--miss)}
+.meter-l{font-size:12.5px; color:var(--ink2); margin-top:6px; font-variant-numeric:tabular-nums}
+.row-acts{display:flex; gap:6px; justify-content:flex-end; align-items:center}
+.add-bar{display:flex; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border); background:var(--sunken); border-radius:16px 16px 0 0}
+.add-bar .input{background:var(--surface)}
+
+.empty{padding:56px 24px; text-align:center; display:grid; justify-items:center; gap:8px}
+.empty .ic{width:48px; height:48px; border-radius:14px; background:var(--sunken); display:grid; place-items:center; color:var(--ink2); margin-bottom:6px}
+.empty h3{font-size:16px; font-weight:600}
+.empty p{color:var(--ink2); max-width:42ch}
+.empty .btn, .empty form{margin-top:10px}
+.empty form{display:flex; gap:10px; width:min(100%, 420px)}
+
+/* checklist editor */
+.groups{display:grid; gap:16px}
+.group-h{display:flex; gap:14px; padding:18px 20px; border-bottom:1px solid var(--border); align-items:flex-start}
+.gi{width:36px; height:36px; border-radius:10px; display:grid; place-items:center; flex:none}
+.gi-speech{background:var(--req-bg); color:var(--req)}
+.gi-caption{background:var(--met-bg); color:var(--met)}
+.gi-manual{background:var(--unc-bg); color:var(--unc)}
+.group-h h3{font-size:15px; font-weight:600; display:flex; gap:8px; align-items:center}
+.group-h .count{font-size:12px; color:var(--ink3); font-weight:500; background:var(--sunken); padding:1px 8px; border-radius:99px}
+.group-h p{color:var(--ink2); font-size:13.5px; margin-top:2px}
+.reqs{list-style:none; margin:0; padding:0}
+.req{display:flex; align-items:center; gap:12px; padding:12px 12px 12px 20px; border-bottom:1px solid var(--border); min-height:54px}
+.req .num{width:22px; font-size:12.5px; color:var(--ink3); font-variant-numeric:tabular-nums; flex:none}
+.req .t{flex:1; min-width:0}
+.req.editing{gap:10px; flex-wrap:wrap}
+.req.editing .input{flex:1 1 280px}
+.add-req{display:flex; align-items:center; gap:8px; width:100%; padding:14px 20px; color:var(--ink2); font-size:13.5px; font-weight:500; border-radius:0 0 16px 16px}
+.add-req:hover{background:var(--hover); color:var(--ink)}
+.add-req svg{width:16px; height:16px}
+.add-form{display:flex; gap:10px; padding:12px 20px 16px; flex-wrap:wrap}
+.add-form .input{flex:1 1 260px}
+
+/* ---------- setup wizard ---------- */
+.wiz{display:grid; grid-template-columns:400px minmax(0,1fr); min-height:100vh}
+.wiz-side{
+  background:var(--panel); color:var(--panel-ink); padding:32px 36px; display:flex; flex-direction:column;
+  position:sticky; top:0; height:100vh;
+}
+.wiz-side .logo{color:var(--panel-ink); padding:0 0 48px}
+.wiz-side .glyph{background:var(--panel-ink); color:var(--panel)}
+.wiz-side h2{font-size:26px; line-height:1.25; font-weight:600; letter-spacing:-.02em}
+.wiz-side .lead{color:var(--panel-soft); margin-top:12px; font-size:14.5px; max-width:34ch}
+.steps{list-style:none; padding:0; margin:44px 0 0; display:grid; gap:4px}
+.steps li{display:grid; grid-template-columns:32px 1fr; gap:14px; padding:10px 0; position:relative}
+.steps li:not(:last-child)::after{content:''; position:absolute; left:15px; top:44px; bottom:-6px; width:2px; background:#3A342E; border-radius:2px}
+.steps .dot{width:32px; height:32px; border-radius:50%; border:1.5px solid #4A433B; display:grid; place-items:center; font-size:13px; font-weight:600; color:var(--panel-soft)}
+.steps .dot svg{width:15px; height:15px}
+.steps .on .dot{background:var(--panel-ink); color:var(--panel); border-color:var(--panel-ink)}
+.steps .done .dot{background:#2F5E43; border-color:#2F5E43; color:#E4F0E6}
+.steps b{display:block; font-weight:600; font-size:14.5px; margin-top:5px}
+.steps span{color:var(--panel-soft); font-size:13px}
+.steps .on b{color:var(--panel-ink)} .steps li:not(.on):not(.done) b{color:var(--panel-soft)}
+.wiz-side .foot{margin-top:auto; color:var(--panel-soft); font-size:12.5px}
+.wiz-main{padding:56px 64px 80px; max-width:900px; width:100%}
+.wiz-main .eyebrow{font-size:13px; color:var(--ink3); font-weight:500}
+.wiz-main h1{font-size:30px; font-weight:600; letter-spacing:-.025em; margin-top:6px}
+.wiz-main .sub{color:var(--ink2); margin-top:8px; font-size:15px; max-width:60ch}
+.wiz-body{margin-top:28px}
+.wiz-foot{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:28px; flex-wrap:wrap}
+.brief-box{padding:4px}
+.brief-box textarea{border:0; box-shadow:none !important; min-height:360px; background:transparent; font-size:14.5px; padding:16px}
+.brief-tools{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 12px; border-top:1px solid var(--border); flex-wrap:wrap}
+.warn{color:var(--miss); font-size:13.5px; margin-top:12px}
+.note{display:flex; gap:10px; align-items:flex-start; padding:12px 14px; border-radius:12px; background:var(--sunken); color:var(--ink2); font-size:13.5px}
+.note svg{width:16px; height:16px; margin-top:2px}
 
 /* ---------- review ---------- */
-.back{display:inline-block; margin-top:28px; font-size:14px}
-.rv-head{display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:8px 20px}
-.rv-head h1{margin-top:14px; margin-bottom:4px}
-.versions{display:flex; gap:4px; font-size:13.5px}
-.versions a{text-decoration:none; color:var(--soft); padding:4px 10px; border-radius:999px; border:1px solid transparent}
-.versions a[aria-current]{color:var(--ink); border-color:var(--line2)}
-.decided{font-size:14px; color:var(--soft); margin:0}
-.rv{display:grid; gap:32px; margin-top:24px}
-@media (min-width:860px){
-  .rv{grid-template-columns:minmax(300px,380px) 1fr; gap:56px; align-items:start}
-  .media{position:sticky; top:20px}
-}
-.frame{
-  width:min(100%, calc(76vh * 9 / 16)); aspect-ratio:9/16; margin:0 auto;
-  background:var(--frame); border-radius:16px; overflow:hidden; position:relative;
-  display:grid; place-items:center;
-}
-.frame video{width:100%; height:100%; object-fit:contain; display:block; background:#000}
-.frame .nofile{color:#b9b0a4; font-size:13.5px; text-align:center; padding:24px; line-height:1.5}
-.said{margin:24px 0 0}
-.said dt{font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:.08em; color:var(--soft); margin-top:18px}
-.said dd{margin:4px 0 0; font-size:14.5px; white-space:pre-wrap; overflow-wrap:anywhere}
-.said dd.clamp{display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden}
-.said .none{color:var(--faint); font-style:italic}
-.rv .lines{margin-top:0}
-.ask{margin-top:12px; border-left:2px solid var(--change); padding:2px 0 2px 12px}
-.ask .k{font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:.08em; color:var(--change)}
-.ask p{margin:2px 0 0; font-size:14.5px}
-.askform{margin-top:12px}
-.askform textarea{min-height:76px; font-size:14px}
-.askform .actions{margin-top:6px; gap:4px 20px}
-.askform .go{font-size:14px}
-.ov{display:inline-flex; gap:10px; align-items:center}
-.ov button{color:var(--soft); text-decoration:underline; text-decoration-color:var(--line2); text-underline-offset:4px; padding:4px 0}
-.ov button:hover{color:var(--ink)}
-.dock{
-  position:sticky; bottom:0; margin-top:32px; background:var(--bg);
-  border-top:1px solid var(--ink); padding:12px 0 calc(12px + env(safe-area-inset-bottom));
-  display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; z-index:2;
-}
-.dock span{font-size:14px; color:var(--soft)}
+.rv{display:grid; grid-template-columns:360px minmax(0,1fr); gap:24px; align-items:start}
+.rv-left{position:sticky; top:20px; display:grid; gap:16px}
+.frame{aspect-ratio:9/16; width:100%; background:#0E0D0C; border-radius:12px; overflow:hidden; display:grid; place-items:center}
+.frame video{width:100%; height:100%; object-fit:contain; background:#000; display:block}
+.frame .nofile{color:#A89F93; font-size:13px; text-align:center; padding:24px; display:grid; gap:8px; justify-items:center}
+.vcard{padding:12px}
+.vmeta{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:12px 4px 2px; flex-wrap:wrap}
+.seg{display:inline-flex; background:var(--sunken); border-radius:9px; padding:3px; gap:2px}
+.seg a{padding:4px 12px; border-radius:7px; font-size:13px; font-weight:500; color:var(--ink2); text-decoration:none}
+.seg a[aria-current]{background:var(--surface); color:var(--ink); box-shadow:var(--shadow)}
+.textcard .card-b{padding:14px 18px 16px}
+.textcard .k{font-size:12px; font-weight:500; color:var(--ink3); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px}
+.textcard .v{white-space:pre-wrap; overflow-wrap:anywhere; font-size:14px}
+.textcard .v.clamp{display:-webkit-box; -webkit-line-clamp:6; -webkit-box-orient:vertical; overflow:hidden}
+.textcard .none{color:var(--ink3); font-style:italic}
+.textcard button{margin-top:8px; font-size:13px; color:var(--ink2); text-decoration:underline; text-underline-offset:3px}
+.sum{display:flex; gap:16px; align-items:center; flex-wrap:wrap}
+.sum span{display:inline-flex; align-items:center; gap:6px; font-size:13px; color:var(--ink2); font-variant-numeric:tabular-nums}
+.sum i{width:8px; height:8px; border-radius:50%}
+.sec-l{font-size:12px; font-weight:500; color:var(--ink3); text-transform:uppercase; letter-spacing:.05em; padding:14px 20px 6px; display:flex; justify-content:space-between; align-items:center}
+.res-list{list-style:none; margin:0; padding:0}
+.res{display:grid; grid-template-columns:24px minmax(0,1fr) auto; gap:14px; padding:14px 20px; border-top:1px solid var(--border); align-items:start}
+.res-t{font-size:14.5px; font-weight:500}
+.res-meta{display:flex; flex-wrap:wrap; gap:4px 12px; align-items:center; margin-top:4px}
+.ev{font-size:13.5px; color:var(--ink2)}
+.ev.quote{font-style:italic}
+.over-note{font-size:12.5px; color:var(--ink3); margin-top:6px}
+.res-acts{display:flex; gap:4px; align-items:center}
+.ask{margin-top:10px; padding:10px 12px; border-radius:10px; background:var(--req-bg); color:var(--ink)}
+.ask .k{font-size:12px; font-weight:600; color:var(--req); display:flex; gap:6px; align-items:center}
+.ask .k svg{width:14px; height:14px}
+.ask p{margin-top:3px; font-size:14px}
+.ask-form{margin-top:10px; display:grid; gap:8px}
+.ask-form .row{display:flex; gap:8px}
+.banner{display:flex; align-items:center; gap:10px; padding:12px 16px; border-radius:12px; margin-bottom:16px; font-size:14px}
+.banner svg{width:17px; height:17px}
+.banner.req{background:var(--req-bg); color:var(--req)}
+.banner.met{background:var(--met-bg); color:var(--met)}
+.allgood{padding:16px 20px; border-top:1px solid var(--border); color:var(--met); display:flex; gap:10px; align-items:center; font-size:14px}
+.allgood svg{width:16px; height:16px}
+details.fold > summary{list-style:none; cursor:pointer}
+details.fold > summary::-webkit-details-marker{display:none}
+details.fold > summary .chev{transition:transform .15s; width:15px; height:15px}
+details.fold[open] > summary .chev{transform:rotate(180deg)}
+.mob-dock{display:none}
 
 /* ---------- creator ---------- */
-.changes{margin-top:36px}
-.changes .label{margin-top:0; color:var(--change)}
-.changes .lines{border-bottom-color:var(--line)}
-.brief-peek{margin-top:26px; border-top:1px solid var(--line); border-bottom:1px solid var(--line)}
-.brief-peek summary{cursor:pointer; padding:12px 0; font-size:14px; color:var(--soft); list-style:none; display:flex; justify-content:space-between}
-.brief-peek summary::-webkit-details-marker{display:none}
-.brief-peek summary::after{content:'+'; color:var(--faint); font-size:17px; line-height:1}
-.brief-peek[open] summary::after{content:'–'}
-.brief-peek ol{margin:0 0 14px; padding-left:20px; font-size:14px; color:var(--soft)}
-.brief-peek li{margin:6px 0}
-.brief-peek li small{color:var(--faint)}
-.pick{
-  width:min(100%, 240px); aspect-ratio:9/16; margin:12px 0 0;
-  border:1.5px dashed var(--line2); border-radius:16px; display:grid; place-content:center;
-  text-align:center; gap:4px; cursor:pointer; transition:border-color .15s, background .15s;
+.ctop{position:sticky; top:0; z-index:10; background:color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter:blur(10px); border-bottom:1px solid var(--border)}
+.ctop-in{max-width:1120px; margin:0 auto; padding:12px 24px; display:flex; align-items:center; gap:16px}
+.ctop .logo{padding:0}
+.ctop .camp{color:var(--ink2); font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; padding-left:16px; border-left:1px solid var(--border)}
+.ctop .me{margin-left:auto; display:flex; align-items:center; gap:10px; font-size:14px; font-weight:500; white-space:nowrap}
+.ctop .me .av{width:30px; height:30px; font-size:12px}
+.cwrap{max-width:1120px; margin:0 auto; padding:36px 24px 96px}
+.chead{margin-bottom:24px}
+.chead .eyebrow{font-size:13px; color:var(--ink3); font-weight:500}
+.chead h1{font-size:28px; font-weight:600; letter-spacing:-.025em; margin-top:4px}
+.chead .sub{color:var(--ink2); margin-top:6px; max-width:62ch}
+.cgrid{display:grid; grid-template-columns:340px minmax(0,1fr); gap:24px; align-items:start}
+.cleft{position:sticky; top:84px; display:grid; gap:16px}
+.cright{display:grid; gap:16px}
+.drop{
+  aspect-ratio:9/16; border:1.5px dashed var(--border2); border-radius:12px; display:grid; place-content:center;
+  justify-items:center; text-align:center; gap:6px; cursor:pointer; padding:20px; transition:border-color .15s, background .15s;
 }
-.pick:hover{border-color:var(--ink); background:var(--field)}
-.pick:focus-within{border-color:var(--ink)}
-.pick b{font-weight:500; font-size:15px}
-.pick small{color:var(--faint); font-size:12.5px}
-.picked{margin:12px 0 0; width:min(100%, 240px); margin-left:0}
-.fileline{font-size:13px; color:var(--faint); margin-top:8px; display:flex; gap:14px; align-items:center; flex-wrap:wrap}
-.sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
-.tick{display:grid; grid-template-columns:22px 1fr; gap:14px; padding:13px 0; border-top:1px solid var(--line); cursor:pointer; font-size:15px; position:relative}
-.ticks{border-bottom:1px solid var(--line); margin-top:10px}
-.box{width:22px; height:22px; border-radius:6px; border:1.5px solid var(--line2); display:grid; place-items:center; color:transparent; transition:all .15s}
-.box svg{width:14px; height:14px}
-.tick:hover .box{border-color:var(--ink)}
+.drop:hover, .drop.over{border-color:var(--ink); background:var(--hover)}
+.drop:focus-within{border-color:var(--ink)}
+.drop .ic{width:44px; height:44px; border-radius:12px; background:var(--sunken); display:grid; place-items:center; margin-bottom:6px}
+.drop b{font-weight:600}
+.drop small{color:var(--ink3); font-size:12.5px}
+.file-row{display:flex; justify-content:space-between; align-items:center; gap:8px; padding:12px 4px 2px; font-size:13px; color:var(--ink2)}
+.file-row span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0}
+.step-h{display:flex; gap:12px; align-items:flex-start; margin-bottom:12px}
+.step-n{width:26px; height:26px; border-radius:50%; background:var(--ink); color:var(--bg); display:grid; place-items:center; font-size:12.5px; font-weight:600; flex:none; margin-top:1px}
+.step-h h3{font-size:15.5px; font-weight:600}
+.step-h p{color:var(--ink2); font-size:13.5px; margin-top:2px}
+.ticks{display:grid; gap:0; border:1px solid var(--border); border-radius:12px; overflow:hidden}
+.tick{display:flex; gap:12px; align-items:flex-start; padding:12px 14px; cursor:pointer; border-top:1px solid var(--border); font-size:14px}
+.tick:first-child{border-top:0}
+.tick:hover{background:var(--hover)}
+.box{width:20px; height:20px; border-radius:6px; border:1.5px solid var(--border2); display:grid; place-items:center; color:transparent; flex:none; margin-top:1px; transition:all .12s}
+.box svg{width:13px; height:13px}
 .tick input:checked + .box{background:var(--ink); border-color:var(--ink); color:var(--bg)}
-.tick input:focus-visible + .box{outline:2px solid var(--ink); outline-offset:3px}
-.history{list-style:none; padding:0; margin:10px 0 0; border-bottom:1px solid var(--line)}
-.history li{display:grid; grid-template-columns:40px 1fr auto; gap:12px; padding:12px 0; border-top:1px solid var(--line); font-size:14px; align-items:baseline}
-.history .vn{font-weight:600}
-.history .when{color:var(--faint); font-size:13px}
+.tick input:focus-visible + .box{outline:2px solid var(--ink); outline-offset:2px}
+.submit-bar{display:flex; justify-content:space-between; align-items:center; gap:14px; padding:16px 20px; flex-wrap:wrap}
+.submit-bar p{color:var(--ink2); font-size:13.5px}
+.callout{padding:18px 20px; border-color:color-mix(in srgb, var(--req) 30%, var(--border)); background:color-mix(in srgb, var(--req-bg) 55%, var(--surface))}
+.callout h3{font-size:15px; font-weight:600; color:var(--req); display:flex; gap:8px; align-items:center}
+.callout h3 svg{width:17px; height:17px}
+.callout ol{margin:12px 0 0; padding:0; list-style:none; display:grid; gap:10px}
+.callout li{background:var(--surface); border-radius:10px; padding:12px 14px; border:1px solid var(--border)}
+.callout li p{font-size:14.5px; font-weight:500}
+.callout li small{display:block; color:var(--ink3); font-size:12.5px; margin-top:3px}
+.brief-list{margin:0; padding:4px 20px 14px; list-style:none}
+.brief-list li{display:flex; gap:10px; padding:8px 0; border-top:1px solid var(--border); font-size:13.5px; align-items:flex-start}
+.brief-list li:first-child{border-top:0}
+.brief-list .kind-tag{margin-left:auto; flex:none; margin-top:2px}
+.fold-h{display:flex; justify-content:space-between; align-items:center; padding:16px 20px; font-weight:600; font-size:14.5px}
 
-/* ---------- footer, toast ---------- */
-footer{margin-top:72px; padding-top:16px; border-top:1px solid var(--line); font-size:12.5px; color:var(--faint); line-height:1.6}
-footer .link{font-size:12.5px; color:var(--faint); padding:0}
+.checking{max-width:720px; margin:0 auto}
+.checking .card-h{padding:22px 24px}
+.checking .card-h h1{font-size:20px; font-weight:600; letter-spacing:-.015em}
+.checking .card-h p{color:var(--ink2); margin-top:4px; font-size:14px}
+.ring-spin{width:40px; height:40px; border-radius:12px; background:var(--sunken); display:grid; place-items:center; flex:none}
+.live .res{grid-template-columns:24px minmax(0,1fr)}
+.live .pending .res-t{color:var(--ink3)}
+@media (prefers-reduced-motion:no-preference){
+  .si-pending::after{animation:breathe 1.2s ease-in-out infinite}
+  .landed .si{animation:land .4s cubic-bezier(.2,.9,.3,1.3) both}
+  .landed .res-meta{animation:rise .3s ease both .06s}
+}
+@keyframes breathe{50%{opacity:.3; transform:scale(.6)}}
+@keyframes land{0%{transform:scale(.3); opacity:0} 100%{transform:scale(1); opacity:1}}
+@keyframes rise{from{opacity:0; transform:translateY(3px)} to{opacity:1; transform:none}}
+
+.score{padding:28px 24px; display:grid; justify-items:center; text-align:center; gap:4px}
+.ring{position:relative; width:132px; height:132px; margin-bottom:10px}
+.ring svg{width:132px; height:132px; transform:rotate(-90deg)}
+.ring .n{position:absolute; inset:0; display:grid; place-content:center; text-align:center}
+.ring .n b{font-size:32px; font-weight:600; letter-spacing:-.03em; line-height:1}
+.ring .n small{color:var(--ink3); font-size:12.5px; margin-top:4px}
+.score h2{font-size:20px; font-weight:600; letter-spacing:-.015em}
+.score p{color:var(--ink2); font-size:14px; max-width:36ch}
+.score .acts{display:grid; gap:8px; width:100%; margin-top:18px}
+.success-ic{width:56px; height:56px; border-radius:50%; display:grid; place-items:center; margin-bottom:8px}
+.success-ic svg{width:26px; height:26px}
+.hist{list-style:none; margin:0; padding:0}
+.hist li{display:grid; grid-template-columns:44px minmax(0,1fr) auto; gap:12px; padding:14px 20px; border-top:1px solid var(--border); align-items:center}
+.hist li:first-child{border-top:0}
+.hist .vn{font-weight:600}
+.hist .when{color:var(--ink3); font-size:12.5px}
+.hist .ask{margin-top:8px}
+
+/* toast */
 .toast{
   position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom)); transform:translate(-50%, 12px);
-  background:var(--ink); color:var(--bg); font-size:13.5px; padding:9px 16px; border-radius:999px;
-  opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; z-index:9; white-space:nowrap;
+  background:var(--ink); color:var(--bg); font-size:13.5px; font-weight:500; padding:10px 16px; border-radius:12px;
+  opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; z-index:50; white-space:nowrap; box-shadow:var(--pop);
+  display:flex; gap:8px; align-items:center;
 }
+.toast svg{width:16px; height:16px}
 .toast.show{opacity:1; transform:translate(-50%, 0)}
 
-@media (max-width:480px){
-  h1{font-size:25px; margin-top:36px}
-  .kicker{margin-top:36px; margin-bottom:-28px}
-  .label{margin-top:36px}
-  .person{grid-template-columns:1fr !important}
+/* ---------- responsive ---------- */
+@media (max-width:1100px){
+  .rv{grid-template-columns:300px minmax(0,1fr)}
+  .wiz{grid-template-columns:340px minmax(0,1fr)}
+  .wiz-main{padding:48px 40px 80px}
+}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .side{position:sticky; top:0; z-index:20; height:auto; flex-direction:row; align-items:center; padding:8px 12px; gap:8px; border-right:0; border-bottom:1px solid var(--border)}
+  .side .logo{padding:0 4px 0 0}
+  .side .logo > span:not(.glyph), .camp-box, .side-foot{display:none}
+  .nav{flex-direction:row; overflow-x:auto; scrollbar-width:none; gap:2px}
+  .nav::-webkit-scrollbar{display:none}
+  .nav a{height:36px; padding:0 12px; white-space:nowrap}
+  .nav a svg{display:none}
+  .page-head{padding:24px 16px 18px}
+  .page-head h1{font-size:23px}
+  .content{padding:0 16px 96px}
+  .stats{grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px}
+  .stat{padding:14px}
+  .stat .v{font-size:24px}
+  .tbl thead{display:none}
+  .tbl, .tbl tbody, .tbl tr, .tbl td{display:block; width:100%}
+  .tbl tr{padding:14px 16px; border-bottom:1px solid var(--border); display:grid; grid-template-columns:1fr auto; gap:10px 12px; align-items:center}
+  .tbl tr:last-child{border-bottom:0}
+  .tbl td{padding:0; border:0}
+  .tbl td.c-who{grid-column:1}
+  .tbl td.c-status{grid-column:2; grid-row:1; justify-self:end}
+  .tbl td.c-meter{grid-column:1 / -1}
+  .tbl td.c-when{display:none}
+  .tbl td.c-acts{grid-column:1 / -1}
   .row-acts{justify-content:flex-start}
-  .add{flex-direction:column; align-items:stretch; gap:6px}
-  .add .go{align-self:flex-start}
+  .wiz{grid-template-columns:1fr}
+  .wiz-side{position:static; height:auto; padding:16px 16px 18px}
+  .wiz-side .logo{padding:0 0 14px}
+  .wiz-side h2, .wiz-side .lead, .wiz-side .foot{display:none}
+  .steps{margin:0; grid-template-columns:repeat(3, 1fr); gap:8px}
+  .steps li{grid-template-columns:1fr; gap:6px; padding:0}
+  .steps li::after{display:none}
+  .steps .dot{width:26px; height:26px; font-size:12px}
+  .steps b{font-size:12.5px; margin:0}
+  .steps span{display:none}
+  .wiz-main{padding:28px 16px 80px}
+  .wiz-main h1{font-size:24px}
+  .brief-box textarea{min-height:260px}
+  .rv{grid-template-columns:1fr}
+  .rv-left{position:static}
+  .frame{max-height:70vh; width:auto; margin:0 auto}
+  .res{grid-template-columns:24px minmax(0,1fr); padding:14px 16px}
+  .res-acts{grid-column:2}
+  .sec-l{padding:14px 16px 6px}
+  .card-h{padding:14px 16px}
+  .page-head .acts.desk{display:none}
+  .mob-dock{display:flex; position:fixed; left:0; right:0; bottom:0; z-index:25; padding:12px 16px calc(12px + env(safe-area-inset-bottom)); background:var(--surface); border-top:1px solid var(--border); gap:10px; align-items:center; justify-content:space-between}
+  .mob-dock span{font-size:13px; color:var(--ink2)}
+  .ctop-in{padding:10px 16px}
+  .ctop .logo > span:not(.glyph), .ctop .camp{display:none}
+  .cwrap{padding:24px 16px 96px}
+  .chead h1{font-size:23px}
+  .cgrid{grid-template-columns:1fr}
+  .cleft{position:static}
+  .drop{aspect-ratio:auto; min-height:180px}
+  .cleft .frame{max-height:60vh}
+  .submit-bar .btn{width:100%}
 }
 </style>
 </head>
 <body>
-<div id="app" class="wrap"></div>
+<div id="app"></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script>
 /* =====================================================================
-   Reel Check, frontend.
-   Swap points for the AWS build (see build-plan.md):
-     parseBrief()  -> Bedrock, Step D
-     runCheck()    -> Bedrock, Step D
-     api           -> API Gateway + Lambda + DynamoDB, Step A
-     vids          -> presigned S3 upload, Step B
-   Everything else stays as it is.
+   Reel Check
+   Swap points for the AWS build plan:
+     ai()   -> OpenRouter today (api/ai.py); Bedrock later, same shapes
+     api    -> localStorage today; API Gateway + Lambda + DynamoDB (Step A)
+     vids   -> IndexedDB today; presigned S3 upload (Step B)
+   parseBrief() and runCheck() are the offline fallbacks when AI is down.
    ===================================================================== */
 
 const SAMPLE = `invideo Editor: Effects Library
@@ -329,13 +499,21 @@ CTA and publishing
 - Tag and add as collaborators: @invideo.io and @invideo.creators`;
 
 /* ---------------------------------------------------------------------
-   parseBrief: brief text -> checklist items {id, text, kind, terms[]}
-   kind is one of caption | speech | manual
+   AI (server-side, key never in the browser)
+   --------------------------------------------------------------------- */
+async function ai(task, payload){
+  const r = await fetch('api/ai', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({task, ...payload})});
+  const data = await r.json().catch(() => ({}));
+  if(!r.ok) throw new Error(data.error || 'HTTP ' + r.status);
+  return data;
+}
+
+/* ---------------------------------------------------------------------
+   Offline fallbacks
    --------------------------------------------------------------------- */
 const STOP = new Set(('the a an and or to of in on for your you with it its is are that this they them can keep make give any own from at by as into their was were be been have has do does did get got how what which when use used using also more most each every all not no one two my our we i he she his her if then than so up out about just like want will would should could may might must shall ' +
   'tell say says mention show shows showing start started done work handle directly steps where possible video there here make sure include').split(' '));
 const BULLET = /^\s*(?:[-•●▪*–]|\d+[.)])\s+/;
-
 function kindFromLine(line){
   const l = line.toLowerCase();
   if(/[@#][a-z0-9._]/i.test(line) || /\b(caption|tag|tags|comment|collaborators?|hashtags?|description)\b/.test(l)) return 'caption';
@@ -354,20 +532,16 @@ function termsFor(line, kind){
   const handles = line.match(/[@#][a-zA-Z0-9._]*[a-zA-Z0-9_]/g) || [];
   const quoted = (line.match(/["“]([^"”]+)["”]/g) || []).map(s => s.replace(/["“”]/g,'').toLowerCase());
   if(handles.length || quoted.length) return [...new Set([...handles.map(h => h.toLowerCase()), ...quoted])];
-  const phrases = [];
-  if(/\bsign[\s-]?up\b/i.test(line)) phrases.push('sign up');
-  const words = line.toLowerCase().replace(/sign[\s-]?up/g,' ').replace(/[^a-z0-9 ]/g,' ').split(/\s+/)
-    .filter(w => w.length > 3 && !STOP.has(w));
+  const phrases = /\bsign[\s-]?up\b/i.test(line) ? ['sign up'] : [];
+  const words = line.toLowerCase().replace(/sign[\s-]?up/g,' ').replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(w => w.length > 3 && !STOP.has(w));
   return [...new Set([...phrases, ...words])].slice(0,5);
 }
 function parseBrief(text){
-  const lines = text.split(/\r?\n/);
-  const hasBullets = lines.some(l => BULLET.test(l));
+  const lines = text.split(/\r?\n/), hasBullets = lines.some(l => BULLET.test(l));
   const out = []; let heading = '';
   lines.forEach((raw, i) => {
     const t = raw.trim(); if(!t) return;
-    const bulleted = BULLET.test(raw);
-    if(hasBullets && !bulleted){ heading = t; return; }
+    if(hasBullets && !BULLET.test(raw)){ heading = t; return; }
     const line = t.replace(BULLET,'').trim();
     if(line.length < 12 || (!hasBullets && (i === 0 || /:$/.test(line)))){ heading = line; return; }
     const kind = kindFromLine(line) || kindFromHeading(heading) || 'manual';
@@ -375,13 +549,24 @@ function parseBrief(text){
   });
   return out;
 }
-/* The AI version: server.py sends the brief to OpenRouter and returns
-   the same {text, kind, terms} shape. parseBrief stays as the fallback. */
-async function aiChecklist(text){
-  const r = await fetch('api/checklist', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({brief: text})});
-  const data = await r.json().catch(() => ({}));
-  if(!r.ok) throw new Error(data.error || 'HTTP ' + r.status);
-  return {items: data.items.map(it => ({id: uid('i'), text: it.text, kind: it.kind, terms: it.terms || []})), builtBy: data.model || 'ai'};
+const reEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+function found(hay, term){
+  if(/[\s@#]/.test(term)) return hay.includes(term);
+  const stem = term.length > 5 ? term.replace(/(ing|ed|es|s)$/,'') : term;
+  return new RegExp('(^|[^a-z0-9])' + reEsc(stem)).test(hay);
+}
+function runCheck(item, sub){
+  if(item.kind === 'manual') return {verdict: sub.ticks && sub.ticks[item.id] ? 'pass' : 'miss', evidence:''};
+  const hay = ((item.kind === 'caption' ? sub.caption : sub.script) || '').toLowerCase().replace(/\s+/g,' ');
+  const terms = (item.terms && item.terms.length ? item.terms : termsFor(item.text, item.kind)).map(t => t.toLowerCase());
+  const where = item.kind === 'caption' ? 'caption' : 'script';
+  if(!hay.trim()) return {verdict:'miss', evidence:`The ${where} is empty.`};
+  if(!terms.length) return {verdict:'unsure', evidence:'Needs a human look.'};
+  const gone = terms.filter(t => !found(hay, t));
+  if(!gone.length) return {verdict:'pass', evidence:`Mentioned in the ${where}.`};
+  if(item.kind === 'caption') return {verdict:'miss', evidence:`Missing from the caption: ${gone.join(', ')}.`};
+  if(gone.length < terms.length) return {verdict:'unsure', evidence:'Partly covered, may be worded differently.'};
+  return {verdict:'miss', evidence:'Not mentioned in the script.'};
 }
 function titleOf(text){
   const first = (text || '').split(/\r?\n/).map(s => s.trim()).find(Boolean) || '';
@@ -389,49 +574,40 @@ function titleOf(text){
 }
 
 /* ---------------------------------------------------------------------
-   runCheck: one item + one submission -> {verdict, evidence}
-   verdict: pass | miss | unsure | ticked | unticked
+   Build a checklist, check a submission (AI first, fallback second)
    --------------------------------------------------------------------- */
-const reEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-function found(hay, term){
-  if(/[\s@#]/.test(term)) return hay.includes(term);
-  const stem = term.length > 5 ? term.replace(/(ing|ed|es|s)$/,'') : term;
-  return new RegExp('(^|[^a-z0-9])' + reEsc(stem)).test(hay);
-}
-const q = arr => arr.map(t => '“' + t + '”').join(', ');
-function runCheck(item, sub){
-  if(item.kind === 'manual'){
-    return sub.ticks && sub.ticks[item.id]
-      ? {verdict:'ticked', evidence:'A visual line, confirmed with a tick.'}
-      : {verdict:'unticked', evidence:'A visual line, so it needs a tick once it\'s in the reel.'};
+async function buildChecklist(text){
+  try{
+    const d = await ai('checklist', {brief: text});
+    if(!d.items || !d.items.length) throw new Error('empty');
+    return {items: d.items.map(it => ({id: uid('i'), text: it.text, kind: it.kind, terms: it.terms || []})), by:'ai'};
+  }catch(e){
+    console.warn('AI checklist unavailable, using the simple parser:', e.message);
+    return {items: parseBrief(text), by:'simple'};
   }
-  const where = item.kind === 'caption' ? 'the caption' : 'the script';
-  const hay = ((item.kind === 'caption' ? sub.caption : sub.script) || '').toLowerCase().replace(/\s+/g,' ');
-  const terms = (item.terms || []).map(t => t.toLowerCase().trim()).filter(Boolean);
-  if(!hay.trim()) return {verdict:'miss', evidence: item.kind === 'caption' ? 'The caption is empty.' : 'No script to check against yet.'};
-  if(!terms.length) return {verdict:'unsure', evidence:'No terms to look for, so this needs a human eye.'};
-  const hit = terms.filter(t => found(hay, t)), gone = terms.filter(t => !found(hay, t));
-  if(!gone.length) return {verdict:'pass', evidence:`Found ${q(hit)} in ${where}.`};
-  if(item.kind === 'caption') return {verdict:'miss', evidence:`Not in the caption yet: ${q(gone)}.`};
-  if(hit.length) return {verdict:'unsure', evidence:`Found ${q(hit)} but not ${q(gone)}. It may just be worded differently.`};
-  return {verdict:'miss', evidence:`None of ${q(terms)} came up in the script.`};
 }
-function checkAll(sub){
-  const r = {}; (S.campaign ? S.campaign.items : []).forEach(it => r[it.id] = runCheck(it, sub)); return r;
+async function checkSubmission(sub){
+  const items = S.campaign.items, res = {};
+  items.filter(i => i.kind === 'manual').forEach(i => res[i.id] = runCheck(i, sub));
+  const auto = items.filter(i => i.kind !== 'manual');
+  let by = 'ai';
+  try{
+    const d = await ai('check', {items: auto.map(({id, text, kind}) => ({id, text, kind})), caption: sub.caption, script: sub.script});
+    d.results.forEach(r => { res[r.id] = {verdict: r.verdict, evidence: r.evidence, quote: r.verdict === 'pass'}; });
+  }catch(e){ console.warn('AI check unavailable, using keyword matching:', e.message); by = 'simple'; }
+  auto.forEach(i => { if(!res[i.id]) res[i.id] = runCheck(i, sub); });
+  return {results: res, by};
 }
 
 /* ---------------------------------------------------------------------
-   api: the four Step A endpoints. Local storage today; set
-   window.REELCHECK_API to an API Gateway URL to go remote.
+   api: the four Step A endpoints. localStorage today.
    --------------------------------------------------------------------- */
-const KEY = 'reelcheck.v2';
-const API_BASE = window.REELCHECK_API || '';
+const KEY = 'reelcheck.v3';
 const blank = () => ({campaign:null, creators:[], subs:{}});
 function readLocal(){ try{ const r = localStorage.getItem(KEY); if(r) return JSON.parse(r); }catch(e){} return blank(); }
 function writeLocal(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
 let S = readLocal();
-
-const localApi = {
+const api = {
   async load(){ S = readLocal(); },
   async saveCampaign(c){ S.campaign = c; writeLocal(); },
   async registerCreator(name){ const c = {id:uid('u'), name, addedAt:Date.now()}; S.creators.push(c); writeLocal(); return c; },
@@ -439,25 +615,8 @@ const localApi = {
   async review(cid, n, review){ const v = version(cid, n); if(v){ v.review = review; writeLocal(); } },
   async reset(){ S = blank(); writeLocal(); }
 };
-async function call(method, path, body){
-  const r = await fetch(API_BASE + path, {method, headers:{'Content-Type':'application/json'}, body: body ? JSON.stringify(body) : undefined});
-  if(!r.ok) throw new Error(method + ' ' + path + ' ' + r.status);
-  return r.status === 204 ? null : r.json();
-}
-const remoteApi = {
-  async load(id){ id = id || (S.campaign && S.campaign.id); if(id) S = await call('GET', `/campaigns/${id}`); },
-  async saveCampaign(c){ await call('PUT', `/campaigns/${c.id}`, c); S.campaign = c; },
-  async registerCreator(name){ const c = await call('POST', `/campaigns/${S.campaign.id}/creators`, {name}); S.creators.push(c); return c; },
-  async submit(cid, v){ await call('POST', `/campaigns/${S.campaign.id}/creators/${cid}/submissions`, v); (S.subs[cid] = S.subs[cid] || {versions:[]}).versions.push(v); },
-  async review(cid, n, review){ await call('PUT', `/campaigns/${S.campaign.id}/creators/${cid}/submissions/${n}/review`, review); const v = version(cid, n); if(v) v.review = review; },
-  async reset(){ S = blank(); }
-};
-const api = API_BASE ? remoteApi : localApi;
 
-/* ---------------------------------------------------------------------
-   vids: reel files. IndexedDB on this device today, so the brand's
-   tab can play what the creator's tab uploaded. Step B swaps in S3.
-   --------------------------------------------------------------------- */
+/* vids: reel files in IndexedDB so the brand's tab can play them. Step B -> S3. */
 const vids = (() => {
   let p; const urls = {};
   const db = () => p = p || new Promise((res, rej) => {
@@ -487,374 +646,500 @@ const vids = (() => {
    --------------------------------------------------------------------- */
 function uid(p){ return p + Math.random().toString(36).slice(2,8) + Date.now().toString(36).slice(-3); }
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
+const plural = (n, w, ws) => n + ' ' + (n === 1 ? w : (ws || w + 's'));
 const when = t => new Date(t).toLocaleString([], {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+const ago = t => { const m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'just now' : m < 60 ? m + 'm ago' : m < 1440 ? Math.round(m / 60) + 'h ago' : when(t); };
 const creator = id => S.creators.find(c => c.id === id);
 const versions = cid => (S.subs[cid] && S.subs[cid].versions) || [];
 const version = (cid, n) => versions(cid).find(v => v.n === n);
 const latest = cid => { const v = versions(cid); return v[v.length - 1]; };
 const item = id => S.campaign && S.campaign.items.find(i => i.id === id);
+const initials = n => (n.replace(/^@/,'').split(/[\s._-]+/).filter(Boolean).slice(0,2).map(w => w[0]).join('') || '?').toUpperCase();
+const hue = s => [...s].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 360, 7);
+const avatar = n => `<span class="av" style="background:hsl(${hue(n)} 45% 82%)" aria-hidden="true">${esc(initials(n))}</span>`;
 
-const svg = p => `<svg viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
-const ICON = {
-  pass: svg('<path d="M5.5 10.4l3 3 6-6.8"/>'),
-  miss: svg('<path d="M6.8 6.8l6.4 6.4M13.2 6.8l-6.4 6.4"/>'),
-  unsure: svg('<path d="M7.8 7.7a2.3 2.3 0 1 1 3.3 2.1c-.7.3-1.1.8-1.1 1.5v.3"/><path d="M10 14.3h.01" stroke-width="2.8"/>'),
-  ticked: svg('<path d="M5.5 10.4l3 3 6-6.8"/>'),
-  unticked: '',
-  change: svg('<path d="M8.4 5.6L5 9l3.4 3.4"/><path d="M5.6 9H12a3 3 0 0 1 0 6h-1.2"/>')
+const svg = (p, cls = 'i') => `<svg class="${cls}" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const P_ = {
+  grid:'<rect x="3" y="3" width="6" height="6" rx="1.6"/><rect x="11" y="3" width="6" height="6" rx="1.6"/><rect x="3" y="11" width="6" height="6" rx="1.6"/><rect x="11" y="11" width="6" height="6" rx="1.6"/>',
+  list:'<path d="M8.5 5h8.5M8.5 10h8.5M8.5 15h8.5"/><path d="M3.3 5l1 1 1.8-2.2M3.3 10l1 1 1.8-2.2M3.3 15l1 1 1.8-2.2"/>',
+  doc:'<path d="M5 2.5h6.5L15.5 6.5v11H5z"/><path d="M11 2.5v4h4.5M7.5 10.5h5M7.5 13.5h5"/>',
+  caption:'<path d="M3.5 5.5h13M3.5 10h13M3.5 14.5h8"/>',
+  speech:'<rect x="7.3" y="2.5" width="5.4" height="9.5" rx="2.7"/><path d="M4.5 9.5a5.5 5.5 0 0 0 11 0M10 15v2.5"/>',
+  manual:'<path d="M2 10s3-5.5 8-5.5S18 10 18 10s-3 5.5-8 5.5S2 10 2 10z"/><circle cx="10" cy="10" r="2.3"/>',
+  plus:'<path d="M10 4.5v11M4.5 10h11"/>',
+  copy:'<rect x="7" y="7" width="10" height="10" rx="2.2"/><path d="M13 7V5.2A2.2 2.2 0 0 0 10.8 3H5.2A2.2 2.2 0 0 0 3 5.2v5.6A2.2 2.2 0 0 0 5.2 13H7"/>',
+  ext:'<path d="M8.5 4H4.5v11.5H16v-4"/><path d="M11 3.5h5.5V9M16.5 3.5L9 11"/>',
+  dots:'<circle cx="4.5" cy="10" r=".9" fill="currentColor"/><circle cx="10" cy="10" r=".9" fill="currentColor"/><circle cx="15.5" cy="10" r=".9" fill="currentColor"/>',
+  back:'<path d="M12 4.5L6.5 10l5.5 5.5"/>',
+  right:'<path d="M4 10h11.5M11 5.5l4.5 4.5-4.5 4.5"/>',
+  spark:'<path d="M10 2.5l1.7 4.3 4.3 1.7-4.3 1.7L10 14.5l-1.7-4.3L4 8.5l4.3-1.7z"/><path d="M15.5 13.5l.6 1.5 1.5.6-1.5.6-.6 1.5-.6-1.5-1.5-.6 1.5-.6z"/>',
+  upload:'<path d="M10 13V3.5M6 7.5l4-4 4 4M3.5 13v3.5h13V13"/>',
+  pass:'<path d="M5.5 10.4l3 3 6-6.8"/>',
+  miss:'<path d="M6.5 6.5l7 7M13.5 6.5l-7 7"/>',
+  unsure:'<path d="M7.7 7.6a2.4 2.4 0 1 1 3.4 2.2c-.7.3-1.1.8-1.1 1.5v.4"/><path d="M10 14.4h.01" stroke-width="2.6"/>',
+  change:'<path d="M8.4 5.6L5 9l3.4 3.4"/><path d="M5.6 9H12a3 3 0 0 1 0 6h-1.2"/>',
+  edit:'<path d="M12.5 4.5l3 3L7 16H4v-3z"/>',
+  trash:'<path d="M4 6h12M8 6V4h4v2M5.5 6l.8 10h7.4l.8-10"/>',
+  users:'<circle cx="8" cy="7" r="3"/><path d="M2.5 16.5c.6-3 2.7-4.5 5.5-4.5s4.9 1.5 5.5 4.5"/><path d="M13 4.2a3 3 0 0 1 0 5.6M15.5 12.4c1 .8 1.7 2.1 2 4.1"/>',
+  film:'<rect x="3" y="3" width="14" height="14" rx="2.5"/><path d="M8 7.2v5.6l4.6-2.8z"/>',
+  chev:'<path d="M5.5 8l4.5 4.5L14.5 8"/>',
+  send:'<path d="M3.5 10L16.5 4l-4.5 13-2.3-5.2z"/><path d="M9.7 11.8l6.8-7.8"/>',
+  info:'<circle cx="10" cy="10" r="7.5"/><path d="M10 9v4.5M10 6.5h.01"/>',
+  play:'<path d="M7 4.5v11l8.5-5.5z" fill="currentColor" stroke="none"/>'
 };
-const LABEL = {
-  brand:  {pass:'Pass', miss:'Missing', unsure:'Not sure', ticked:'Creator ticked', unticked:'Not ticked', change:'Change asked'},
-  creator:{pass:'There', miss:'To fix', unsure:'Not sure', ticked:'You ticked', unticked:'Not ticked', change:'Change asked'}
+const I = new Proxy({}, {get: (_, k) => svg(P_[k] || '')});
+const Is = new Proxy({}, {get: (_, k) => svg(P_[k] || '', 'i i-sm')});
+
+const KINDS = {
+  speech: {name:'Spoken', desc:'Checked against what the creator says on camera. Any wording that covers the point counts.'},
+  caption:{name:'Caption', desc:'Checked against the caption. Tags, handles and keywords must be there exactly.'},
+  manual: {name:'Visual', desc:'The creator confirms these are in the video. You check them when you watch it.'}
 };
-const KIND = {
-  caption:{label:'Checked in the caption', hint:'Looked for word for word in the caption.', pick:'in the caption'},
-  speech: {label:'Checked in what they say', hint:'Looked for in the voiceover or script.', pick:'in what they say'},
-  manual: {label:'Creator ticks', hint:'Visual. The creator confirms it, and you judge it in the reel.', pick:'by the creator'}
-};
-const mark = v => `<span class="vm">${ICON[v] || ''}</span>`;
-const isFix = v => v === 'miss' || v === 'unticked';
-const isOk = v => v === 'pass' || v === 'ticked';
+const ORDER = ['speech','caption','manual'];
+const LABEL = {brand:{pass:'Met', miss:'Missing', unsure:'Unclear'}, creator:{pass:'Done', miss:'To fix', unsure:'Unclear'}};
+const kindTag = k => `<span class="kind-tag">${I[k]}${KINDS[k].name}</span>`;
+const statusIcon = v => `<span class="si si-${v}" aria-hidden="true">${I[v] || ''}</span>`;
+const logo = (text = true) => `<span class="glyph">${svg(P_.play)}</span>${text ? '<span>Reel Check</span>' : ''}`;
+
+function evidenceText(it, r, who){
+  if(it.kind === 'manual'){
+    if(who === 'creator') return r.verdict === 'pass' ? 'You confirmed it’s in your reel.' : 'Tick it once it’s in your reel.';
+    return r.verdict === 'pass' ? 'Creator confirmed it’s in the video. Check it when you watch.' : 'Creator hasn’t confirmed this is in the video.';
+  }
+  return r.evidence || '';
+}
+const evHtml = (it, r, who) => { const t = evidenceText(it, r, who); return t ? `<span class="ev ${r.quote ? 'quote' : ''}">${r.quote ? '“' + esc(t.replace(/^["“]|["”]$/g,'')) + '”' : esc(t)}</span>` : ''; };
 
 function reviewOf(v){ return v.review || {changes:{}, overrides:{}, decision:null}; }
-function verdictsFor(cid, v){
-  const auto = checkAll(v), rv = reviewOf(v), out = {};
-  Object.keys(auto).forEach(id => out[id] = rv.overrides[id] || auto[id].verdict);
+function verdictsFor(v){
+  const stored = v.results || {}, auto = {}, out = {}, rv = reviewOf(v);
+  S.campaign.items.forEach(it => {
+    auto[it.id] = stored[it.id] || (v.results ? {verdict:'unsure', evidence:'Added to the checklist after this version was sent.'} : runCheck(it, v));
+    out[it.id] = rv.overrides[it.id] || auto[it.id].verdict;
+  });
   return {auto, out, rv};
 }
+const counts = out => { const vs = Object.values(out); return {met: vs.filter(v => v === 'pass').length, miss: vs.filter(v => v === 'miss').length, unc: vs.filter(v => v === 'unsure').length, total: vs.length}; };
 function statusOf(cid){
   const v = latest(cid);
-  if(!v) return {key:'waiting', text:'Waiting for their reel'};
+  if(!v) return {key:'waiting', text:'Waiting for reel'};
   const d = v.review && v.review.decision;
-  if(!d) return {key:'review', text:`Version ${v.n} needs your review`};
-  if(d === 'approved') return {key:'approved', text:`Version ${v.n} approved`};
-  return {key:'changes', text:`${plural(Object.keys(v.review.changes).length, 'change')} sent on version ${v.n}`};
+  if(!d) return {key:'review', text:'Needs review'};
+  if(d === 'approved') return {key:'approved', text:'Approved'};
+  return {key:'changes', text:'Changes requested'};
 }
-const needsReview = () => S.creators.filter(c => statusOf(c.id).key === 'review');
-function linkFor(cid){
-  const base = location.href.split(/[?#]/)[0];
-  return `${base}?c=${encodeURIComponent(S.campaign ? S.campaign.id : '')}&u=${encodeURIComponent(cid)}`;
+const pill = st => `<span class="pill p-${st.key}">${st.text}</span>`;
+function linkFor(cid){ return `${location.href.split(/[?#]/)[0]}?c=${encodeURIComponent(S.campaign.id)}&u=${encodeURIComponent(cid)}`; }
+function meter(out){
+  const c = counts(out), w = n => (n / c.total * 100) + '%';
+  return `<div class="meter" aria-hidden="true"><span class="m" style="width:${w(c.met)}"></span><span class="u" style="width:${w(c.unc)}"></span><span class="x" style="width:${w(c.miss)}"></span></div>
+    <div class="meter-l">${c.met} of ${c.total} met${c.miss ? ` · ${c.miss} missing` : ''}${c.unc ? ` · ${c.unc} unclear` : ''}</div>`;
+}
+function menu(label, items){
+  return `<details class="menu"><summary class="icon-btn" aria-label="${esc(label)}">${I.dots}</summary><div class="menu-pop" role="menu">${items.join('')}</div></details>`;
 }
 let toastT;
-function toast(msg){
-  const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
-  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 1900);
+function toast(msg, icon = 'pass'){
+  const t = document.getElementById('toast'); t.innerHTML = svg(P_[icon]) + esc(msg); t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2200);
 }
-function tally(verdicts){
-  const vs = Object.values(verdicts);
-  const c = k => vs.filter(k).length;
-  const p = c(isOk), m = c(isFix), u = c(v => v === 'unsure');
-  return `<span class="tally" aria-label="${p} there, ${m} missing, ${u} not sure"><span class="tp"><i></i>${p}</span><span class="tm"><i></i>${m}</span><span class="tu"><i></i>${u}</span></span>`;
+async function copyLink(cid, quiet){
+  const url = linkFor(cid);
+  try{ await navigator.clipboard.writeText(url); if(!quiet) toast('Link copied'); return true; }
+  catch(e){ if(!quiet) prompt('Copy this link and send it to the creator', url); return false; }
 }
-const empty = (title, text, href, cta) =>
-  `<div class="empty"><h1>${title}</h1><p class="lede">${text}</p>${href ? `<div class="actions"><a class="go" href="${href}">${cta} <span class="arr">→</span></a></div>` : ''}</div>`;
 
 /* =====================================================================
    BRAND
    ===================================================================== */
-const UI = {draftBrief:null, buildWarn:'', ask:null, refocus:null, more:false};
+const UI = {busy:false, warn:'', draftBrief:null, wizStep:null, editing:null, adding:null, addOpen:false, ask:null, more:false, briefEdit:false};
+const setupDone = () => S.campaign && (!S.campaign.setup || S.campaign.setup === 'done');
 
-function defaultRoute(){
-  if(!S.campaign) return 'brief';
-  if(!S.creators.length) return 'creators';
-  return S.creators.some(c => latest(c.id)) ? 'review' : 'creators';
-}
-function brandShell(active, inner){
-  const c = S.campaign, nr = needsReview().length;
-  const tabs = [['brief','Brief'], ['checklist','Checklist', c && c.items.length], ['creators','Creators', S.creators.length], ['review','Review', nr]];
-  return `
-    <header class="top"><a class="mark-word" href="#brief">Reel Check</a>${c ? `<span class="camp">${esc(c.title)}</span>` : ''}</header>
-    <nav class="steps" aria-label="Campaign">${tabs.map(([k, l, n]) =>
-      `<a href="#${k}" ${active === k ? 'aria-current="page"' : ''}>${l}${n ? `<span class="n ${k === 'review' ? 'hot' : ''}">${n}</span>` : ''}</a>`).join('')}</nav>
-    <main>${inner}</main>
-    <footer>Demo build, stored in this browser. The check reads the caption and what's said on camera; anything visual stays with the creator's tick and your eye, and you can override every verdict.
-      <button class="link" data-act="reset">Start over</button></footer>`;
+function brandApp(){
+  if(!setupDone()) return wizard();
+  const [r, a, b] = location.hash.slice(1).split('/');
+  const page = ['overview','checklist','brief','review'].includes(r) ? r : 'overview';
+  const body = page === 'checklist' ? pageChecklist()
+    : page === 'brief' ? pageBrief()
+    : page === 'review' && a ? pageReview(a, b ? +b : null)
+    : pageOverview();
+  const nr = S.creators.filter(c => statusOf(c.id).key === 'review').length;
+  const nav = [['overview','Creators', I.users, nr], ['checklist','Checklist', I.list], ['brief','Brief', I.doc]];
+  const on = page === 'review' ? 'overview' : page;
+  return `<div class="app">
+    <aside class="side">
+      <a class="logo" href="#overview">${logo()}</a>
+      <div class="camp-box"><div class="k">Campaign</div><div class="t">${esc(S.campaign.title)}</div></div>
+      <nav class="nav" aria-label="Main">${nav.map(([k, l, ic, n]) => `<a href="#${k}" ${on === k ? 'aria-current="page"' : ''}>${ic}${l}${n ? `<span class="badge" title="${n} to review">${n}</span>` : ''}</a>`).join('')}</nav>
+      <div class="side-foot">Demo build. Everything is saved in this browser.<br><button data-act="reset">Start a new campaign</button></div>
+    </aside>
+    <div class="main">${body}</div>
+  </div>`;
 }
 
-function viewBrief(){
-  const b = UI.draftBrief != null ? UI.draftBrief : (S.campaign ? S.campaign.brief : '');
+/* ---------- setup wizard ---------- */
+function wizard(){
+  const step = UI.wizStep || (S.campaign ? S.campaign.setup : 'brief');
+  const steps = [['brief','Paste the brief','AI reads it for you'], ['checklist','Check the checklist','What every reel must have'], ['creators','Invite creators','Each gets a private link']];
+  const idx = steps.findIndex(s => s[0] === step);
+  const body = step === 'checklist' ? wizChecklist() : step === 'creators' ? wizCreators() : wizBrief();
+  return `<div class="wiz">
+    <aside class="wiz-side">
+      <div class="logo">${logo()}</div>
+      <h2>Set up a campaign in three steps.</h2>
+      <p class="lead">Paste your brief once. Every reel your creators send is checked against it before you watch.</p>
+      <ol class="steps">${steps.map(([k, t, s], i) => `<li class="${i === idx ? 'on' : i < idx ? 'done' : ''}">
+        <span class="dot">${i < idx ? I.pass : i + 1}</span><div><b>${t}</b><span>${s}</span></div></li>`).join('')}</ol>
+      <p class="foot">No accounts. Creators just open their link.</p>
+    </aside>
+    <main class="wiz-main">${body}</main>
+  </div>`;
+}
+function wizBrief(){
+  const text = UI.draftBrief != null ? UI.draftBrief : (S.campaign ? S.campaign.brief : '');
   return `
-    <h1>Campaign brief</h1>
-    <p class="lede">Paste the brief you send creators. Every line they have to act on becomes a checklist item.</p>
-    <div style="margin-top:24px">
-      <textarea id="brief" class="page" placeholder="Paste your brief here. One requirement per line works best." aria-label="Campaign brief" spellcheck="false">${esc(b)}</textarea>
-      <p class="sample"><button class="link" data-act="sample">Or use the invideo sample brief</button></p>
+    <p class="eyebrow">Step 1 of 3</p>
+    <h1>Paste your campaign brief</h1>
+    <p class="sub">Paste it exactly as you'd send it to creators. AI pulls out every requirement and sorts it by how it can be checked.</p>
+    <div class="wiz-body">
+      <div class="card brief-box">
+        <textarea id="brief" class="input" placeholder="Paste your brief here…" aria-label="Campaign brief" ${UI.busy ? 'disabled' : ''}>${esc(text)}</textarea>
+        <div class="brief-tools">
+          <button class="btn ghost sm" data-act="sample" ${UI.busy ? 'disabled' : ''}>${Is.doc} Use a sample brief</button>
+          <span class="faint small">${text.trim() ? plural(text.trim().split(/\s+/).length, 'word') : ''}</span>
+        </div>
+      </div>
+      ${UI.warn ? `<p class="warn">${esc(UI.warn)}</p>` : ''}
     </div>
-    ${UI.buildWarn ? `<p class="warn">${UI.buildWarn}</p>` : ''}
-    <div class="actions">
-      <button class="go" data-act="build">${S.campaign ? 'Rebuild checklist' : 'Build checklist'} <span class="arr">→</span></button>
-      ${S.campaign ? `<span class="note">Rebuilding replaces the checklist. Creators keep their links.</span>` : ''}
+    <div class="wiz-foot">
+      <span class="faint small">Takes about 5 seconds.</span>
+      <button class="btn primary lg" data-act="build" ${UI.busy ? 'disabled' : ''}>${UI.busy ? '<span class="spin"></span> Reading your brief…' : `${I.spark} Create checklist`}</button>
+    </div>`;
+}
+function wizChecklist(){
+  const c = S.campaign;
+  return `
+    <p class="eyebrow">Step 2 of 3</p>
+    <h1>Check the checklist</h1>
+    <p class="sub">${plural(c.items.length, 'requirement')} found in your brief. Every reel is checked against this list, so fix anything that's off.</p>
+    ${c.builtBy === 'simple' ? `<div class="note" style="margin-top:18px">${I.info}<span>AI wasn't reachable, so a simpler reader built this list. Give it a closer look.</span></div>` : ''}
+    <div class="wiz-body">${checklistEditor()}</div>
+    <div class="wiz-foot">
+      <button class="btn ghost" data-act="wizback">${Is.back} Back to brief</button>
+      <button class="btn primary lg" data-act="wiznext" data-to="creators">Looks good, continue ${I.right}</button>
+    </div>`;
+}
+function wizCreators(){
+  return `
+    <p class="eyebrow">Step 3 of 3</p>
+    <h1>Invite your creators</h1>
+    <p class="sub">Add each creator and send them their link. They upload the reel there and see what's missing before you do.</p>
+    <div class="wiz-body">
+      <div class="card">
+        <form class="add-bar" data-form="creator" autocomplete="off" style="border-radius:16px ${S.creators.length ? '16px 0 0' : ''}">
+          <input class="input" id="cname" placeholder="Creator name or @handle" aria-label="Creator name or handle">
+          <button class="btn primary">${Is.plus} Add</button>
+        </form>
+        ${S.creators.length ? `<ul class="hist">${S.creators.map(c => `<li style="grid-template-columns:auto minmax(0,1fr) auto">
+          ${avatar(c.name)}<div><div style="font-weight:500">${esc(c.name)}</div><div class="faint small" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(linkFor(c.id))}</div></div>
+          <button class="btn sm" data-act="copy" data-id="${c.id}">${Is.copy} Copy link</button></li>`).join('')}</ul>` : ''}
+      </div>
+    </div>
+    <div class="wiz-foot">
+      <button class="btn ghost" data-act="wizback">${Is.back} Back</button>
+      <button class="btn primary lg" data-act="wiznext" data-to="done">${S.creators.length ? 'Go to dashboard' : 'Skip for now'} ${I.right}</button>
     </div>`;
 }
 
-function viewChecklist(){
-  const c = S.campaign;
-  if(!c) return empty('No checklist yet', 'Paste a brief and the checklist builds itself from it.', '#brief', 'Go to the brief');
-  const groups = ['caption','speech','manual'].map(k => {
-    const items = c.items.filter(i => i.kind === k);
-    if(!items.length) return '';
-    return `<section>
-      <h2 class="label">${KIND[k].label}<span class="n">${items.length}</span></h2>
-      <p class="hint">${KIND[k].hint}</p>
-      <ol class="lines plain">${items.map(itemEditor).join('')}</ol>
+/* ---------- checklist editor (wizard + checklist page) ---------- */
+function checklistEditor(){
+  let n = 0;
+  return `<div class="groups">${ORDER.map(k => {
+    const items = S.campaign.items.filter(i => i.kind === k);
+    return `<section class="card">
+      <div class="group-h"><span class="gi gi-${k}">${I[k]}</span><div><h3>${KINDS[k].name} <span class="count">${items.length}</span></h3><p>${KINDS[k].desc}</p></div></div>
+      <ol class="reqs">${items.map(it => reqRow(it, ++n)).join('')}</ol>
+      ${UI.adding === k ? `<div class="add-form"><input class="input" id="addtext" placeholder="Describe the requirement…" aria-label="New requirement">
+          <button class="btn primary" data-act="addsave" data-kind="${k}">Add</button><button class="btn ghost" data-act="addcancel">Cancel</button></div>`
+        : `<button class="add-req" data-act="addopen" data-kind="${k}">${I.plus} Add a ${KINDS[k].name.toLowerCase()} requirement</button>`}
     </section>`;
+  }).join('')}</div>`;
+}
+function reqRow(it, n){
+  if(UI.editing === it.id) return `<li class="req editing"><span class="num">${n}</span><input class="input" id="edittext" value="${esc(it.text)}" aria-label="Requirement">
+    <button class="btn sm primary" data-act="editsave" data-id="${it.id}">Save</button><button class="btn sm ghost" data-act="editcancel">Cancel</button></li>`;
+  const moves = ORDER.filter(k => k !== it.kind).map(k => `<button data-act="move" data-id="${it.id}" data-kind="${k}">${Is[k]} Move to ${KINDS[k].name}</button>`);
+  return `<li class="req"><span class="num">${n}</span><span class="t">${esc(it.text)}</span>
+    ${menu('Options', [`<button data-act="editopen" data-id="${it.id}">${Is.edit} Edit</button>`, ...moves, '<hr>', `<button class="danger" data-act="rmitem" data-id="${it.id}">${Is.trash} Delete</button>`])}</li>`;
+}
+
+/* ---------- overview ---------- */
+function pageOverview(){
+  const cs = S.creators, st = cs.map(c => statusOf(c.id).key);
+  const n = k => st.filter(x => x === k).length;
+  const stats = [['Needs review', n('review'), 'var(--unc)'], ['Changes requested', n('changes'), 'var(--req)'], ['Approved', n('approved'), 'var(--met)'], ['Waiting for reel', n('waiting'), 'var(--wait)']];
+  const order = {review:0, changes:1, waiting:2, approved:3};
+  const rows = cs.slice().sort((a, b) => order[statusOf(a.id).key] - order[statusOf(b.id).key]).map(c => {
+    const s = statusOf(c.id), v = latest(c.id);
+    return `<tr>
+      <td class="c-who"><div class="who">${avatar(c.name)}<div>${esc(c.name)}${v ? `<div class="faint small" style="font-weight:400">Version ${v.n}</div>` : ''}</div></div></td>
+      <td class="c-status">${pill(s)}</td>
+      <td class="c-meter">${v ? meter(verdictsFor(v).out) : '<span class="faint small">No reel yet</span>'}</td>
+      <td class="c-when faint small">${v ? ago(v.sentAt) : 'Added ' + ago(c.addedAt)}</td>
+      <td class="c-acts"><div class="row-acts">
+        ${v ? `<a class="btn sm ${s.key === 'review' ? 'primary' : ''}" href="#review/${c.id}">${s.key === 'review' ? 'Review' : 'Open'}</a>` : ''}
+        <button class="btn sm" data-act="copy" data-id="${c.id}">${Is.copy} Copy link</button>
+        ${menu('More', [`<a href="${esc(linkFor(c.id))}" target="_blank" rel="noopener">${Is.ext} Open creator's page</a>`])}
+      </div></td>
+    </tr>`;
   }).join('');
+  const addForm = `<form class="add-bar" data-form="creator" autocomplete="off">
+      <input class="input" id="cname" placeholder="Creator name or @handle" aria-label="Creator name or handle">
+      <button class="btn primary">Add creator</button>${cs.length ? '<button type="button" class="btn ghost" data-act="addclose">Cancel</button>' : ''}</form>`;
   return `
-    <h1>Checklist</h1>
-    <p class="lede">${plural(c.items.length, 'line')} from the brief${c.builtBy && c.builtBy !== 'simple' ? ', read by AI' : c.builtBy === 'simple' ? ', read by the simple parser because the AI wasn\'t reachable' : ''}. The automatic check looks for the terms under each line, so edit them to change what it looks for.</p>
-    ${groups || '<p class="hint" style="margin-top:24px">Every line was removed. Rebuild from the brief to start again.</p>'}
-    <div class="actions"><a class="go" href="#creators">${S.creators.length ? 'Creators' : 'Next, add creators'} <span class="arr">→</span></a></div>`;
-}
-function itemEditor(it){
-  const opts = ['caption','speech','manual'].map(k => `<option value="${k}" ${it.kind === k ? 'selected' : ''}>Checked ${KIND[k].pick}</option>`).join('');
-  return `<li data-id="${it.id}">
-    <p class="req">${esc(it.text)}</p>
-    ${it.kind === 'manual' ? '' : `<div class="terms" role="group" aria-label="Terms the check looks for">
-      ${it.terms.map((t, i) => `<span class="term">${esc(t)}<button data-act="rmterm" data-id="${it.id}" data-i="${i}" aria-label="Stop looking for ${esc(t)}">×</button></span>`).join('')}
-      ${it.terms.length ? '' : '<span class="noterms">No terms, so this comes back as not sure.</span>'}
-      <input class="addterm" data-id="${it.id}" placeholder="+ add term" aria-label="Add a term" autocomplete="off">
-    </div>`}
-    <div class="tools">
-      <label class="kind"><span class="sr">How this line is checked</span><select data-act="kind" data-id="${it.id}">${opts}</select></label>
-      <button class="link" data-act="rmitem" data-id="${it.id}">Remove line</button>
-    </div>
-  </li>`;
-}
-
-function viewCreators(){
-  if(!S.campaign) return empty('Build a checklist first', 'Creators get a link to a campaign, so the campaign comes first.', '#brief', 'Go to the brief');
-  const rows = S.creators.map(c => {
-    const st = statusOf(c.id), v = latest(c.id);
-    return `<li class="person">
-      <div>
-        <div class="who">${esc(c.name)}</div>
-        <div class="st st-${st.key}"><span class="dot"></span>${st.text}</div>
-        ${v ? tally(verdictsFor(c.id, v).out) : ''}
+    <header class="page-head">
+      <div><h1>Creators</h1><p class="sub">Every reel arrives already checked against your ${plural(S.campaign.items.length, 'requirement')}.</p></div>
+      ${cs.length ? `<div class="acts"><button class="btn primary" data-act="addopenc">${Is.plus} Add creator</button></div>` : ''}
+    </header>
+    <div class="content">
+      ${cs.length ? `<div class="stats">${stats.map(([k, v, c]) => `<div class="card stat"><div class="k"><i style="background:${c}"></i>${k}</div><div class="v">${v}</div></div>`).join('')}</div>` : ''}
+      <div class="card">
+        ${cs.length ? `${UI.addOpen ? addForm : ''}
+          <table class="tbl"><thead><tr><th>Creator</th><th>Status</th><th>Checklist</th><th>Updated</th><th></th></tr></thead><tbody>${rows}</tbody></table>`
+        : `<div class="empty"><span class="ic">${I.users}</span><h3>Invite your first creator</h3><p>Add a creator and send them their link. No account or password needed.</p>
+            <form data-form="creator" autocomplete="off"><input class="input" id="cname" placeholder="Creator name or @handle" aria-label="Creator name or handle"><button class="btn primary">Add</button></form></div>`}
       </div>
-      <div class="row-acts">
-        <button class="link" data-act="copy" data-id="${c.id}">Copy link</button>
-        <a class="link" href="${esc(linkFor(c.id))}" target="_blank" rel="noopener">Open link ↗</a>
-        ${v ? `<a class="go" href="#review/${c.id}">Review <span class="arr">→</span></a>` : ''}
-      </div>
-    </li>`;
-  }).join('');
-  return `
-    <h1>Creators</h1>
-    <p class="lede">Each creator gets their own link. No account, no password, no invite email. They just open it.</p>
-    <form class="add" data-form="creator" autocomplete="off">
-      <input type="text" id="cname" placeholder="Name or @handle" aria-label="Creator name or handle">
-      <button class="go">Add creator <span class="arr">→</span></button>
-    </form>
-    ${S.creators.length ? `<ol class="lines plain" style="margin-top:28px">${rows}</ol>`
-      : `<p class="hint" style="margin-top:18px">Add the first creator above, then open their link to see what they see.</p>`}`;
+    </div>`;
 }
 
-function viewReviewList(){
-  if(!S.campaign) return empty('Nothing to review yet', 'Start with the brief. Reels show up here once creators send them.', '#brief', 'Go to the brief');
-  const list = S.creators.filter(c => latest(c.id));
-  if(!list.length) return empty('No reels yet', S.creators.length
-    ? 'Open a creator\'s link and send a reel as them. It lands here, already checked.'
-    : 'Add a creator, open their link, and send a reel as them. It lands here, already checked.', '#creators', 'Creators');
-  const order = {review:0, changes:1, approved:2};
-  list.sort((a, b) => order[statusOf(a.id).key] - order[statusOf(b.id).key]);
+/* ---------- checklist + brief pages ---------- */
+function pageChecklist(){
   return `
-    <h1>Review</h1>
-    <p class="lede">Every reel arrives already checked. Open one to watch it, override any verdict, and ask for changes line by line.</p>
-    <ol class="lines plain" style="margin-top:28px">${list.map(c => {
-      const st = statusOf(c.id), v = latest(c.id);
-      return `<li class="person">
-        <div><div class="who">${esc(c.name)}</div><div class="st st-${st.key}"><span class="dot"></span>${st.text}</div>${tally(verdictsFor(c.id, v).out)}</div>
-        <div class="row-acts"><a class="go" href="#review/${c.id}">${st.key === 'review' ? 'Review' : 'Open'} <span class="arr">→</span></a></div>
-      </li>`;
-    }).join('')}</ol>`;
+    <header class="page-head"><div><h1>Checklist</h1><p class="sub">What every reel is checked against. Changes apply to the next reel that's checked.</p></div></header>
+    <div class="content" style="max-width:980px">${checklistEditor()}</div>`;
+}
+function pageBrief(){
+  const c = S.campaign;
+  if(UI.briefEdit) return `
+    <header class="page-head"><div><h1>Edit brief</h1><p class="sub">Rebuilding replaces the checklist. Creators keep their links, and past reels keep their results.</p></div></header>
+    <div class="content" style="max-width:980px">
+      <div class="card brief-box"><textarea id="brief" class="input" aria-label="Campaign brief" ${UI.busy ? 'disabled' : ''}>${esc(UI.draftBrief != null ? UI.draftBrief : c.brief)}</textarea></div>
+      ${UI.warn ? `<p class="warn">${esc(UI.warn)}</p>` : ''}
+      <div class="wiz-foot"><button class="btn ghost" data-act="briefcancel">Cancel</button>
+        <button class="btn primary lg" data-act="rebuild" ${UI.busy ? 'disabled' : ''}>${UI.busy ? '<span class="spin"></span> Reading your brief…' : `${I.spark} Rebuild checklist`}</button></div>
+    </div>`;
+  return `
+    <header class="page-head"><div><h1>Brief</h1><p class="sub">The original brief your checklist was built from.</p></div>
+      <div class="acts"><button class="btn" data-act="briefedit">${Is.edit} Edit and rebuild</button></div></header>
+    <div class="content" style="max-width:980px"><div class="card card-b" style="white-space:pre-wrap; line-height:1.7">${esc(c.brief)}</div></div>`;
 }
 
-function viewReview(cid, nSel){
+/* ---------- review ---------- */
+function pageReview(cid, nSel){
   const c = creator(cid), all = versions(cid);
-  if(!c || !all.length) return empty('Nothing here', 'This creator hasn\'t sent a reel yet.', '#review', 'All reels');
+  if(!c || !all.length) return `<div class="content" style="padding-top:40px"><div class="card empty"><h3>Nothing to review</h3><p>This creator hasn't sent a reel yet.</p><a class="btn" href="#overview">Back to creators</a></div></div>`;
   const v = (nSel && version(cid, nSel)) || all[all.length - 1];
   const isLatest = v === all[all.length - 1];
-  const {auto, out, rv} = verdictsFor(cid, v);
+  const {auto, out, rv} = verdictsFor(v);
   const editable = isLatest && !rv.decision;
-  const nChanges = Object.keys(rv.changes).length;
+  const nCh = Object.keys(rv.changes).length, k = counts(out);
+  const items = S.campaign.items;
+  const attention = items.filter(i => out[i.id] !== 'pass' || rv.changes[i.id]);
+  const met = items.filter(i => out[i.id] === 'pass' && !rv.changes[i.id]);
 
-  const lines = S.campaign.items.map(it => {
+  const row = it => {
     const a = auto[it.id], shown = out[it.id], ch = rv.changes[it.id], over = rv.overrides[it.id];
-    const alt = ['pass','miss','unsure'].filter(x => x !== shown);
-    return `<li class="v-${shown}">
-      ${mark(shown)}
+    const marks = ['pass','miss','unsure'].filter(x => x !== shown).map(x => `<button data-act="ov" data-id="${it.id}" data-v="${x}">${Is[x]} Mark as ${LABEL.brand[x].toLowerCase()}</button>`);
+    if(over) marks.push(`<hr><button data-act="ov" data-id="${it.id}" data-v="">${Is.back} Use the automatic result</button>`);
+    return `<li class="res">
+      ${statusIcon(shown)}
       <div>
-        <p class="req">${esc(it.text)}</p>
-        <p class="ev"><span class="vlabel">${LABEL.brand[shown]}</span>${over ? `<span class="was">You changed this from ${LABEL.brand[a.verdict].toLowerCase()}. </span>` : ''}${esc(a.evidence)}</p>
-        ${ch && UI.ask !== it.id ? `<div class="ask"><span class="k">${editable ? 'You\'re asking' : 'You asked'}</span><p>${esc(ch.note)}</p></div>` : ''}
-        ${editable && UI.ask === it.id ? `<div class="askform">
-            <textarea id="asktext" rows="2" placeholder="What should ${esc(c.name)} change? Say what good looks like." aria-label="Change request">${esc(ch ? ch.note : '')}</textarea>
-            <div class="actions"><button class="go" data-act="asksave" data-id="${it.id}">Save</button><button class="link" data-act="askcancel">Cancel</button>${ch ? `<button class="link" data-act="askremove" data-id="${it.id}">Remove request</button>` : ''}</div>
-          </div>` : ''}
-        ${editable && UI.ask !== it.id ? `<div class="tools">
-            <button class="link" data-act="askopen" data-id="${it.id}">${ch ? 'Edit request' : 'Ask for a change'}</button>
-            <span class="ov">Mark ${alt.map(x => `<button data-act="ov" data-id="${it.id}" data-v="${x}">${LABEL.brand[x].toLowerCase()}</button>`).join('')}${over ? `<button data-act="ov" data-id="${it.id}" data-v="">undo</button>` : ''}</span>
-          </div>` : ''}
+        <p class="res-t">${esc(it.text)}</p>
+        <div class="res-meta">${kindTag(it.kind)}${evHtml(it, shown === a.verdict ? a : {verdict:shown}, 'brand')}</div>
+        ${over ? `<p class="over-note">You marked this ${LABEL.brand[over].toLowerCase()}. The automatic check said ${LABEL.brand[a.verdict].toLowerCase()}.</p>` : ''}
+        ${ch && UI.ask !== it.id ? `<div class="ask"><div class="k">${Is.change} ${editable ? 'Change request' : 'You asked'}</div><p>${esc(ch.note)}</p></div>` : ''}
+        ${editable && UI.ask === it.id ? `<div class="ask-form">
+          <textarea class="input" id="asktext" rows="2" placeholder="What should ${esc(c.name)} change?" aria-label="Change request">${esc(ch ? ch.note : '')}</textarea>
+          <div class="row"><button class="btn sm primary" data-act="asksave" data-id="${it.id}">Save request</button><button class="btn sm ghost" data-act="askcancel">Cancel</button>
+          ${ch ? `<button class="btn sm ghost" data-act="askremove" data-id="${it.id}" style="margin-left:auto">${Is.trash} Remove</button>` : ''}</div></div>` : ''}
       </div>
+      ${editable && UI.ask !== it.id ? `<div class="res-acts"><button class="btn sm" data-act="askopen" data-id="${it.id}">${ch ? 'Edit request' : 'Request change'}</button>${menu('Override result', marks)}</div>` : ''}
     </li>`;
-  }).join('');
-
-  const decided = rv.decision
-    ? `<p class="decided">${rv.decision === 'approved' ? `<span class="c-pass">You approved version ${v.n}</span>` : `<span class="c-change">You sent ${plural(nChanges, 'change')}</span>`} · ${when(rv.at)}</p>`
-    : `<p class="decided">Version ${v.n} · sent ${when(v.sentAt)}</p>`;
+  };
+  const decide = editable ? `<button class="btn primary" data-act="sendreview" data-id="${cid}" data-n="${v.n}">${nCh ? `${Is.send} Send ${plural(nCh, 'change request')}` : `${Is.pass} Approve reel`}</button>` : '';
+  const banner = rv.decision === 'approved' ? `<div class="banner met">${I.pass} You approved version ${v.n} · ${when(rv.at)}</div>`
+    : rv.decision === 'changes' ? `<div class="banner req">${I.change} You sent ${plural(nCh, 'change request')} on version ${v.n} · ${when(rv.at)}${isLatest ? `. Waiting for ${esc(c.name)}'s next version.` : ''}</div>`
+    : !isLatest ? `<div class="banner req">${I.info} This is an older version. <a href="#review/${cid}" style="margin-left:4px">See the latest</a></div>` : '';
 
   return `
-    <a class="link back" href="#review">← All reels</a>
-    <div class="rv-head">
-      <h1>${esc(c.name)}</h1>
-      ${all.length > 1 ? `<nav class="versions" aria-label="Versions">${all.map(x => `<a href="#review/${cid}/${x.n}" ${x === v ? 'aria-current="true"' : ''}>v${x.n}</a>`).join('')}</nav>` : ''}
+    <header class="page-head">
+      <div><a class="crumb" href="#overview">${I.back} Creators</a><h1>${avatar(c.name)}${esc(c.name)} ${pill(statusOf(cid))}</h1></div>
+      <div class="acts desk">${decide}</div>
+    </header>
+    <div class="content">
+      ${banner}
+      <div class="rv">
+        <div class="rv-left">
+          <div class="card vcard">
+            <div class="frame" data-video="${cid}#${v.n}"><div class="nofile">${v.hasVideo ? '<span class="spin"></span>' : `${I.film}<span>No video file was attached to this version.</span>`}</div></div>
+            <div class="vmeta">
+              ${all.length > 1 ? `<nav class="seg" aria-label="Versions">${all.map(x => `<a href="#review/${cid}/${x.n}" ${x === v ? 'aria-current="true"' : ''}>v${x.n}</a>`).join('')}</nav>` : `<span class="small" style="font-weight:500">Version ${v.n}</span>`}
+              <span class="faint small">Sent ${when(v.sentAt)}</span>
+            </div>
+          </div>
+          <div class="card textcard"><div class="card-b"><div class="k">Caption</div><div class="v">${v.caption ? esc(v.caption) : '<span class="none">No caption</span>'}</div></div></div>
+          <div class="card textcard"><div class="card-b"><div class="k">Said on camera</div><div class="v ${UI.more ? '' : 'clamp'}">${v.script ? esc(v.script) : '<span class="none">Nothing pasted</span>'}</div>
+            ${v.script && v.script.length > 260 ? `<button data-act="more">${UI.more ? 'Show less' : 'Show all'}</button>` : ''}</div></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>Checklist results</h2>
+            <div class="sum"><span><i style="background:var(--met)"></i>${k.met} met</span><span><i style="background:var(--miss)"></i>${k.miss} missing</span><span><i style="background:var(--unc)"></i>${k.unc} unclear</span></div></div>
+          ${attention.length ? `<div class="sec-l">Needs your attention · ${attention.length}</div><ol class="res-list">${attention.map(row).join('')}</ol>`
+            : `<div class="allgood">${I.pass} Everything on the checklist is met.</div>`}
+          ${met.length ? `<details class="fold" ${attention.length ? '' : 'open'}><summary class="sec-l" style="border-top:1px solid var(--border)">Met · ${met.length} ${svg(P_.chev, 'chev')}</summary><ol class="res-list">${met.map(row).join('')}</ol></details>` : ''}
+        </div>
+      </div>
     </div>
-    ${decided}
-    <div class="rv">
-      <div class="media">
-        <div class="frame" data-video="${cid}#${v.n}"><span class="nofile">${v.hasVideo ? 'Loading the reel' : 'No video file came with this version.'}</span></div>
-        <dl class="said">
-          <dt>Caption</dt><dd>${v.caption ? esc(v.caption) : '<span class="none">No caption</span>'}</dd>
-          <dt>Said on camera</dt><dd class="${UI.more ? '' : 'clamp'}">${v.script ? esc(v.script) : '<span class="none">Nothing pasted</span>'}</dd>
-        </dl>
-        ${v.script && v.script.length > 240 ? `<button class="link" data-act="more">${UI.more ? 'Show less' : 'Show all'}</button>` : ''}
-      </div>
-      <div>
-        <h2 class="label" style="margin-top:0">Checklist ${tally(out)}</h2>
-        <ol class="lines">${lines}</ol>
-        ${editable ? `<div class="dock">
-          <span>${nChanges ? `${plural(nChanges, 'change')} for ${esc(c.name)}` : 'No changes asked for'}</span>
-          <button class="go" data-act="sendreview" data-id="${cid}" data-n="${v.n}">${nChanges ? 'Send changes' : `Approve version ${v.n}`} <span class="arr">→</span></button>
-        </div>` : ''}
-      </div>
-    </div>`;
+    ${editable ? `<div class="mob-dock"><span>${nCh ? plural(nCh, 'change request') : 'No changes requested'}</span>${decide}</div>` : ''}`;
 }
 
 /* =====================================================================
    CREATOR
    ===================================================================== */
-const P = new URLSearchParams(location.search);
-const CID = P.get('u'), CAMP = P.get('c');
-const CR = {screen:null, draft:null, results:null, n:null, timer:null, warn:''};
+const Q = new URLSearchParams(location.search);
+const CID = Q.get('u'), CAMP = Q.get('c');
+const CR = {screen:null, draft:null, results:null, by:null, n:null, warn:''};
 
 function creatorDefault(){
   const v = latest(CID);
   if(!v) return 'form';
-  const d = v.review && v.review.decision;
-  return d === 'changes' ? 'form' : 'sent';
+  return v.review && v.review.decision === 'changes' ? 'form' : 'sent';
 }
 function ensureDraft(){
   if(CR.draft) return;
   const v = latest(CID);
   CR.draft = {caption: v ? v.caption : '', script: v ? v.script : '', ticks: v ? {...v.ticks} : {}, file:null, url:null};
 }
-function creatorShell(inner){
+function creatorApp(){
   const c = creator(CID);
-  return `<header class="top"><span class="mark-word">Reel Check</span>${c ? `<span class="camp">for ${esc(c.name)}</span>` : ''}</header>
-    <main>${inner}</main>`;
-}
-function creatorView(){
-  const c = creator(CID);
+  const top = `<header class="ctop"><div class="ctop-in"><span class="logo">${logo()}</span>${S.campaign ? `<span class="camp">${esc(S.campaign.title)}</span>` : ''}
+    ${c ? `<span class="me">${avatar(c.name)}${esc(c.name)}</span>` : ''}</div></header>`;
   if(!S.campaign || !c || (CAMP && S.campaign.id !== CAMP))
-    return creatorShell(empty('This link isn\'t set up here', 'For now, links only work in the same browser the brand set the campaign up in. Ask the brand to open it from their creator list.'));
+    return top + `<div class="cwrap"><div class="card empty" style="max-width:560px;margin:40px auto"><span class="ic">${I.info}</span><h3>This link isn't set up in this browser</h3>
+      <p>In this demo, links only open in the same browser the brand used to set up the campaign.</p></div></div>`;
   if(!CR.screen) CR.screen = creatorDefault();
-  if(CR.screen === 'checking') return creatorShell(viewChecking());
-  if(CR.screen === 'result') return creatorShell(viewResult());
-  if(CR.screen === 'sent') return creatorShell(viewSent());
-  return creatorShell(viewForm());
+  const body = CR.screen === 'checking' ? viewChecking() : CR.screen === 'result' ? viewResult() : CR.screen === 'sent' ? viewSent() : viewForm();
+  return top + `<div class="cwrap">${body}</div>`;
 }
 
 function viewForm(){
   ensureDraft();
-  const d = CR.draft, v = latest(CID), items = S.campaign.items;
+  const d = CR.draft, v = latest(CID), items = S.campaign.items, next = v ? v.n + 1 : 1;
   const asked = v && v.review && v.review.decision === 'changes' ? Object.entries(v.review.changes) : [];
-  const next = v ? v.n + 1 : 1;
   const manual = items.filter(i => i.kind === 'manual');
   return `
-    <p class="kicker">${v ? `Version ${next}` : 'Your assignment'}</p>
-    <h1>${esc(S.campaign.title)}</h1>
-    ${asked.length ? `<section class="changes">
-      <h2 class="label">The brand asked for ${plural(asked.length, 'change')}</h2>
-      <p class="hint">On version ${v.n}. Fix ${asked.length === 1 ? 'this' : 'these'}, then send version ${next}.</p>
-      <ol class="lines">${asked.map(([id, ch]) => `<li class="v-change">${mark('change')}<div><p class="req">${esc(ch.note)}</p><p class="ev">On: ${esc((item(id) || ch).text)}</p></div></li>`).join('')}</ol>
-    </section>` : `<p class="lede">Send your reel, caption and script. It gets checked against the brief right away, and you see the result before the brand does.</p>`}
-
-    <details class="brief-peek"><summary>What the brand is looking for · ${plural(items.length, 'line')}</summary>
-      <ol>${items.map(i => `<li>${esc(i.text)} <small>· ${KIND[i.kind].pick.replace('they say','you say').replace('by the creator','you tick it')}</small></li>`).join('')}</ol>
-    </details>
-
-    <h2 class="label">Your reel</h2>
-    ${d.url ? `<div class="frame picked"><video src="${d.url}" controls playsinline></video></div>
-      <div class="fileline"><span>${esc(d.file.name)}</span><label class="link" style="cursor:pointer">Choose a different file<input type="file" accept="video/*" class="sr" data-act="file"></label></div>`
-    : `<label class="pick"><input type="file" accept="video/*" class="sr" data-act="file"><b>Choose your reel</b><small>Portrait video, from your phone or computer</small></label>`}
-
-    <h2 class="label">Caption</h2>
-    <p class="hint">Paste it exactly as you'll post it. Tags and handles are checked word for word.</p>
-    <textarea id="cap" rows="3" data-draft="caption" placeholder="Your caption, tags included" aria-label="Caption">${esc(d.caption)}</textarea>
-
-    <h2 class="label">What you say on camera</h2>
-    <p class="hint">Paste your voiceover or script. The spoken points are checked against it.</p>
-    <textarea id="scr" rows="5" data-draft="script" placeholder="Everything you say in the reel" aria-label="What you say on camera">${esc(d.script)}</textarea>
-
-    ${manual.length ? `<h2 class="label">In the video</h2>
-      <p class="hint">Tick only what's really in the reel. The brand checks these by eye.</p>
-      <div class="ticks">${manual.map(i => `<label class="tick"><input type="checkbox" class="sr" data-act="tick" data-id="${i.id}" ${d.ticks[i.id] ? 'checked' : ''}><span class="box">${ICON.pass}</span><span>${esc(i.text)}</span></label>`).join('')}</div>` : ''}
-
-    ${CR.warn ? `<p class="warn">${CR.warn}</p>` : ''}
-    <div class="actions">
-      <button class="go" data-act="check">Check my reel <span class="arr">→</span></button>
-      <span class="note">Nothing goes to the brand until you send it.</span>
+    <div class="chead">
+      <p class="eyebrow">${v ? `Version ${next}` : 'New submission'}</p>
+      <h1>${v ? 'Send your updated reel' : 'Submit your reel'}</h1>
+      <p class="sub">Add your reel, caption and script. It's checked against the brief right away, and you see the result before the brand does.</p>
+    </div>
+    <div class="cgrid">
+      <div class="cleft">
+        <div class="card vcard">
+          ${d.url ? `<div class="frame"><video src="${d.url}" controls playsinline></video></div>
+            <div class="file-row"><span>${esc(d.file.name)}</span><label class="btn sm" style="cursor:pointer">Replace<input type="file" accept="video/*" class="sr" data-act="file"></label></div>`
+          : `<label class="drop" data-drop><input type="file" accept="video/*" class="sr" data-act="file"><span class="ic">${I.upload}</span><b>Upload your reel</b><small>Drag a video here or tap to choose.<br>Portrait works best.</small></label>`}
+        </div>
+        <details class="card fold"><summary class="fold-h">What the brand wants · ${items.length} ${svg(P_.chev, 'chev')}</summary>
+          <ol class="brief-list">${items.map(i => `<li><span>${esc(i.text)}</span>${kindTag(i.kind)}</li>`).join('')}</ol></details>
+      </div>
+      <div class="cright">
+        ${asked.length ? `<section class="card callout"><h3>${I.change} The brand requested ${plural(asked.length, 'change')}</h3>
+          <ol>${asked.map(([id, ch]) => `<li><p>${esc(ch.note)}</p><small>On: ${esc((item(id) || ch).text)}</small></li>`).join('')}</ol></section>` : ''}
+        <section class="card card-b">
+          <div class="step-h"><span class="step-n">1</span><div><h3>Caption</h3><p>Paste it exactly as you'll post it, tags included.</p></div></div>
+          <textarea class="input" id="cap" rows="3" data-draft="caption" placeholder="Your caption…" aria-label="Caption">${esc(d.caption)}</textarea>
+        </section>
+        <section class="card card-b">
+          <div class="step-h"><span class="step-n">2</span><div><h3>What you say on camera</h3><p>Paste your voiceover or script. Your own words are fine.</p></div></div>
+          <textarea class="input" id="scr" rows="5" data-draft="script" placeholder="Everything you say in the reel…" aria-label="What you say on camera">${esc(d.script)}</textarea>
+        </section>
+        ${manual.length ? `<section class="card card-b">
+          <div class="step-h"><span class="step-n">3</span><div><h3>Confirm what's in your video</h3><p>Tick only what's really in the reel. The brand checks these when they watch.</p></div></div>
+          <div class="ticks">${manual.map(i => `<label class="tick"><input type="checkbox" class="sr" data-act="tick" data-id="${i.id}" ${d.ticks[i.id] ? 'checked' : ''}><span class="box">${I.pass}</span><span>${esc(i.text)}</span></label>`).join('')}</div>
+        </section>` : ''}
+        <div class="card submit-bar">
+          <p>${CR.warn ? `<span style="color:var(--miss)">${esc(CR.warn)}</span>` : 'Nothing is sent to the brand until you choose to.'}</p>
+          <button class="btn primary lg" data-act="check">${I.spark} Check my reel</button>
+        </div>
+      </div>
     </div>`;
 }
 
 function viewChecking(){
-  return `
-    <p class="kicker">Version ${CR.n}</p>
-    <h1>Checking your reel<span class="dots" aria-hidden="true"></span></h1>
-    <p class="lede">Reading your caption and what you say on camera against ${plural(S.campaign.items.length, 'line')} of the brief.</p>
-    <ol class="lines live" aria-live="polite">${S.campaign.items.map(it => `<li class="pending" data-id="${it.id}">${mark('')}<div><p class="req">${esc(it.text)}</p><p class="ev"></p></div></li>`).join('')}</ol>`;
+  return `<div class="checking"><div class="card">
+    <div class="card-h" style="justify-content:flex-start; gap:16px"><span class="ring-spin"><span class="spin"></span></span>
+      <div><h1>Checking version ${CR.n}</h1><p>Reading your caption and script against ${plural(S.campaign.items.length, 'requirement')}. This takes a few seconds.</p></div></div>
+    <ol class="res-list live" aria-live="polite">${S.campaign.items.map(it => `<li class="res pending" data-id="${it.id}"><span class="si si-pending"></span>
+      <div><p class="res-t">${esc(it.text)}</p><div class="res-meta">${kindTag(it.kind)}</div></div></li>`).join('')}</ol>
+  </div></div>`;
 }
-function startChecking(){
+async function startChecking(){
   const d = CR.draft;
-  if(!d.url && !d.caption.trim() && !d.script.trim()){ CR.warn = 'Add your reel, caption or script first, so there\'s something to check.'; render(); return; }
+  if(!d.url && !d.caption.trim() && !d.script.trim()){ CR.warn = 'Add your reel, caption or script first.'; render(); return; }
   CR.warn = '';
   const v = latest(CID); CR.n = v ? v.n + 1 : 1;
-  CR.results = checkAll(d); CR.screen = 'checking'; render(); scrollTo(0, 0);
-  const lis = [...document.querySelectorAll('.live > li')];
+  CR.screen = 'checking'; render(); scrollTo(0, 0);
+  const t0 = Date.now();
+  const {results, by} = await checkSubmission(d);
+  CR.results = results; CR.by = by;
+  await new Promise(r => setTimeout(r, Math.max(0, 1200 - (Date.now() - t0))));
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const first = calm ? 150 : 900, step = calm ? 30 : 240;
+  const lis = [...document.querySelectorAll('.live > li')];
+  const step = calm ? 20 : 170;
   lis.forEach((li, i) => setTimeout(() => {
-    const r = CR.results[li.dataset.id]; if(!r) return;
-    li.className = 'v-' + r.verdict + ' landed';
-    li.querySelector('.vm').innerHTML = ICON[r.verdict] || '';
-    li.querySelector('.ev').innerHTML = `<span class="vlabel">${LABEL.creator[r.verdict]}</span>${esc(r.evidence)}`;
+    const it = item(li.dataset.id), r = results[li.dataset.id]; if(!it || !r) return;
+    li.className = 'res landed';
+    li.innerHTML = `${statusIcon(r.verdict)}<div><p class="res-t">${esc(it.text)}</p><div class="res-meta"><span class="kind-tag" style="color:var(--${r.verdict === 'pass' ? 'met' : r.verdict === 'miss' ? 'miss' : 'unc'})">${LABEL.creator[r.verdict]}</span>${evHtml(it, r, 'creator')}</div></div>`;
     if(!calm) li.scrollIntoView({block:'nearest', behavior:'smooth'});
-  }, first + i * step));
-  clearTimeout(CR.timer);
-  CR.timer = setTimeout(() => { CR.screen = 'result'; render(); scrollTo(0, 0); }, first + lis.length * step + 1000);
+  }, i * step));
+  setTimeout(() => { if(CR.screen === 'checking'){ CR.screen = 'result'; render(); scrollTo(0, 0); } }, lis.length * step + 900);
 }
 
+function resultRow(it, r){
+  return `<li class="res">${statusIcon(r.verdict)}<div><p class="res-t">${esc(it.text)}</p><div class="res-meta">${kindTag(it.kind)}${evHtml(it, r, 'creator')}</div></div></li>`;
+}
+function ring(met, total){
+  const C = 2 * Math.PI * 56, f = total ? met / total : 0;
+  return `<div class="ring"><svg viewBox="0 0 132 132" aria-hidden="true"><circle cx="66" cy="66" r="56" fill="none" stroke="var(--sunken)" stroke-width="10"/>
+    <circle cx="66" cy="66" r="56" fill="none" stroke="var(--met)" stroke-width="10" stroke-linecap="round" stroke-dasharray="${C * f} ${C}"/></svg>
+    <div class="n"><b>${met}/${total}</b><small>met</small></div></div>`;
+}
 function viewResult(){
-  const r = CR.results, vs = Object.values(r).map(x => x.verdict);
-  const fix = vs.filter(isFix).length, uns = vs.filter(v => v === 'unsure').length, ok = vs.filter(isOk).length;
-  const head = fix ? `<em class="c-miss">${plural(fix, 'thing')}</em> to fix`
-    : uns ? `Nearly there, <em class="c-unsure">${uns} to double-check</em>`
-    : `Everything <em class="c-pass">checks out</em>`;
-  const lede = `${ok} of ${vs.length} lines are there.` +
-    (uns ? ` ${uns === 1 ? 'One line' : uns + ' lines'} might just be worded differently, and the brand will judge ${uns === 1 ? 'it' : 'those'}.` : '') +
-    (fix ? ' Fix what\'s missing and check again, or send it as it is.' : ' Send it when you\'re ready.');
-  const rank = v => isFix(v) ? 0 : v === 'unsure' ? 1 : 2;
-  const items = [...S.campaign.items].sort((a, b) => rank(r[a.id].verdict) - rank(r[b.id].verdict));
+  const r = CR.results, items = S.campaign.items;
+  const vs = items.map(i => r[i.id].verdict), met = vs.filter(v => v === 'pass').length, miss = vs.filter(v => v === 'miss').length, unc = vs.filter(v => v === 'unsure').length;
+  const title = miss ? `${plural(miss, 'thing')} to fix` : unc ? 'Almost there' : 'Everything checks out';
+  const msg = miss ? `Fix ${miss === 1 ? 'it' : 'them'} and check again, or send it as it is.${unc ? ` ${unc} ${unc === 1 ? 'line is' : 'lines are'} unclear, and the brand will judge ${unc === 1 ? 'it' : 'those'}.` : ''}`
+    : unc ? `${unc} ${unc === 1 ? 'line is' : 'lines are'} unclear, and the brand will make the call. Send it when you're ready.`
+    : 'Your reel covers the whole brief. Send it to the brand.';
+  const todo = items.filter(i => r[i.id].verdict !== 'pass'), done = items.filter(i => r[i.id].verdict === 'pass');
   return `
-    <p class="kicker">Version ${CR.n} · checked, not sent yet</p>
-    <h1>${head}</h1>
-    <p class="lede">${lede}</p>
-    <ol class="lines" style="margin-top:28px">${items.map(it => { const x = r[it.id]; return `<li class="v-${x.verdict}">${mark(x.verdict)}<div><p class="req">${esc(it.text)}</p><p class="ev"><span class="vlabel">${LABEL.creator[x.verdict]}</span>${esc(x.evidence)}</p></div></li>`; }).join('')}</ol>
-    ${CR.draft.url ? '' : '<p class="warn">No video attached. The brand will only see your caption and script.</p>'}
-    <div class="actions">
-      <button class="go" data-act="send">Send version ${CR.n} to the brand <span class="arr">→</span></button>
-      <button class="link" data-act="edit">Edit and check again</button>
+    <div class="chead"><p class="eyebrow">Version ${CR.n} · checked, not sent yet</p><h1>Here's how your reel did</h1></div>
+    <div class="cgrid">
+      <div class="cleft"><div class="card score">
+        ${ring(met, items.length)}
+        <h2>${title}</h2><p>${msg}</p>
+        ${CR.by === 'simple' ? '<p class="faint small" style="margin-top:6px">AI was unavailable, so a simpler word match was used.</p>' : ''}
+        ${CR.draft.url ? '' : '<p class="small" style="color:var(--miss); margin-top:6px">No video attached. The brand will only see your text.</p>'}
+        <div class="acts">
+          <button class="btn primary lg" data-act="send">${I.send} Send to the brand</button>
+          <button class="btn lg" data-act="edit">${I.edit} Edit and check again</button>
+        </div>
+      </div></div>
+      <div class="card">
+        ${todo.length ? `<div class="sec-l" style="padding-top:18px">To look at · ${todo.length}</div><ol class="res-list">${todo.map(i => resultRow(i, r[i.id])).join('')}</ol>` : ''}
+        ${done.length ? `<div class="sec-l" style="padding-top:18px; ${todo.length ? 'border-top:1px solid var(--border)' : ''}">Done · ${done.length}</div><ol class="res-list">${done.map(i => resultRow(i, r[i.id])).join('')}</ol>` : ''}
+      </div>
     </div>`;
 }
 
@@ -862,18 +1147,24 @@ function viewSent(){
   const v = latest(CID), all = versions(CID).slice().reverse();
   const approved = v.review && v.review.decision === 'approved';
   return `
-    <p class="kicker">${approved ? 'Approved' : 'Sent'}</p>
-    <h1>${approved ? `Version ${v.n} is <em class="c-pass">approved</em>` : `Version ${v.n} is with the brand`}</h1>
-    <p class="lede">${approved ? 'Nothing else to do here. Thanks for the reel.' : 'Their notes will show up on this same link, attached to the exact line they\'re about. Keep it handy.'}</p>
-    <h2 class="label">History</h2>
-    <ol class="history">${all.map(x => {
-      const d = x.review && x.review.decision;
-      const st = d === 'approved' ? '<span class="c-pass">Approved</span>'
-        : d === 'changes' ? `<span class="c-change">${plural(Object.keys(x.review.changes).length, 'change')} asked</span>`
-        : x === v ? 'Waiting for the brand' : '<span class="note">Replaced by a newer version</span>';
-      return `<li><span class="vn">v${x.n}</span><span>${st}</span><span class="when">${when(x.sentAt)}</span></li>`;
-    }).join('')}</ol>
-    ${approved ? '' : `<div class="actions"><button class="link" data-act="newversion">Send a new version instead</button></div>`}`;
+    <div class="cgrid" style="margin-top:8px">
+      <div class="cleft"><div class="card score">
+        <span class="success-ic" style="background:var(--${approved ? 'met' : 'req'}-bg); color:var(--${approved ? 'met' : 'req'})">${approved ? I.pass : I.send}</span>
+        <h2>${approved ? `Version ${v.n} is approved` : `Version ${v.n} is with the brand`}</h2>
+        <p>${approved ? 'Nothing else to do. Thanks for a great reel.' : 'Their feedback will appear on this same link, attached to the exact line it’s about. Keep this link handy.'}</p>
+        ${approved ? '' : `<div class="acts"><button class="btn lg" data-act="newversion">${I.upload} Send a new version</button></div>`}
+      </div></div>
+      <div class="card">
+        <div class="card-h"><h2>Your versions</h2><span class="faint small">${plural(all.length, 'version')}</span></div>
+        <ol class="hist">${all.map(x => {
+          const d = x.review && x.review.decision;
+          const st = d === 'approved' ? pill({key:'approved', text:'Approved'}) : d === 'changes' ? pill({key:'changes', text:`${plural(Object.keys(x.review.changes).length, 'change')} requested`})
+            : x === v ? pill({key:'review', text:'With the brand'}) : pill({key:'waiting', text:'Replaced'});
+          const notes = d === 'changes' ? Object.values(x.review.changes).map(ch => `<div class="ask"><p>${esc(ch.note)}</p></div>`).join('') : '';
+          return `<li><span class="vn">v${x.n}</span><div><span class="when">Sent ${when(x.sentAt)}</span>${notes}</div>${st}</li>`;
+        }).join('')}</ol>
+      </div>
+    </div>`;
 }
 
 /* =====================================================================
@@ -881,85 +1172,91 @@ function viewSent(){
    ===================================================================== */
 const MODE_CREATOR = !!CID;
 function render(){
-  const app = document.getElementById('app');
-  if(MODE_CREATOR){
-    app.className = 'wrap';
-    app.innerHTML = creatorView();
-  } else {
-    const [r, a, b] = location.hash.slice(1).split('/');
-    const active = ['brief','checklist','creators','review'].includes(r) ? r : defaultRoute();
-    const inner = active === 'brief' ? viewBrief()
-      : active === 'checklist' ? viewChecklist()
-      : active === 'creators' ? viewCreators()
-      : a ? viewReview(a, b ? +b : null) : viewReviewList();
-    app.className = 'wrap' + (active === 'review' && a ? ' wide' : '');
-    app.innerHTML = brandShell(active, inner);
-  }
+  document.getElementById('app').innerHTML = MODE_CREATOR ? creatorApp() : brandApp();
   hydrate();
 }
-function grow(t){ t.style.height = 'auto'; t.style.height = (t.scrollHeight + 2) + 'px'; }
+function grow(t){ if(t.id === 'brief') return; t.style.height = 'auto'; t.style.height = (t.scrollHeight + 2) + 'px'; }
 function hydrate(){
   document.querySelectorAll('textarea').forEach(grow);
   document.querySelectorAll('[data-video]').forEach(async f => {
     const url = await vids.url(f.dataset.video);
     if(url) f.innerHTML = `<video src="${url}" controls playsinline preload="metadata"></video>`;
-    else if(f.querySelector('.nofile') && /Loading/.test(f.textContent)) f.querySelector('.nofile').textContent = 'The video file isn\'t on this device.';
+    else if(f.querySelector('.spin')) f.innerHTML = `<div class="nofile">${I.film}<span>The video file isn't on this device.</span></div>`;
   });
-  if(UI.refocus){ const el = document.querySelector(UI.refocus); if(el) el.focus(); UI.refocus = null; }
+  if(UI.refocus){ const el = document.querySelector(UI.refocus); if(el){ el.focus(); if(el.setSelectionRange && el.value) el.setSelectionRange(el.value.length, el.value.length); } UI.refocus = null; }
+}
+const save = () => api.saveCampaign(S.campaign);
+const reviewTarget = () => { const [, cid, n] = location.hash.slice(1).split('/'); const v = n ? version(cid, +n) : latest(cid); v.review = v.review || {changes:{}, overrides:{}, decision:null}; return {cid, v}; };
+
+async function addCreator(name){
+  const c = await api.registerCreator(name);
+  const copied = await copyLink(c.id, true);
+  UI.refocus = '#cname'; render();
+  toast(copied ? `${name} added · link copied` : `${name} added`);
+}
+async function build(text, rebuild){
+  if(!text.trim()){ UI.warn = 'Paste a brief first.'; render(); return; }
+  UI.busy = true; UI.warn = ''; UI.draftBrief = text; render();
+  const {items, by} = await buildChecklist(text);
+  UI.busy = false;
+  if(!items.length){ UI.warn = 'No requirements found. Put each one on its own line and try again.'; render(); return; }
+  UI.draftBrief = null;
+  S.campaign = {...(S.campaign || {id: uid('c'), createdAt: Date.now(), setup:'checklist'}), title: titleOf(text), brief: text, items, builtBy: by};
+  await save();
+  if(rebuild){ UI.briefEdit = false; location.hash = '#checklist'; render(); toast('Checklist rebuilt'); }
+  else { UI.wizStep = null; S.campaign.setup = 'checklist'; await save(); render(); scrollTo(0, 0); }
 }
 
-async function saveCampaign(){ S.campaign.updatedAt = Date.now(); await api.saveCampaign(S.campaign); }
-
 document.addEventListener('click', async e => {
-  const b = e.target.closest('[data-act]'); if(!b || b.tagName === 'INPUT' || b.tagName === 'SELECT') return;
+  document.querySelectorAll('details.menu[open]').forEach(m => { if(!m.contains(e.target) || e.target.closest('.menu-pop button, .menu-pop a')) m.open = false; });
+  const b = e.target.closest('[data-act]'); if(!b || b.tagName === 'INPUT') return;
   const act = b.dataset.act, id = b.dataset.id;
 
+  // setup + checklist
   if(act === 'sample'){ UI.draftBrief = SAMPLE; render(); }
-  if(act === 'build'){
-    const text = document.getElementById('brief').value;
-    if(!text.trim()){ UI.buildWarn = 'Paste a brief first.'; render(); return; }
-    b.disabled = true; b.innerHTML = 'Reading the brief<span class="dots"></span>';
-    let items, builtBy;
-    try{ ({items, builtBy} = await aiChecklist(text)); }
-    catch(err){ console.warn('AI checklist unavailable, using the simple parser:', err.message); items = parseBrief(text); builtBy = 'simple'; }
-    if(!items.length){ UI.draftBrief = text; UI.buildWarn = 'Couldn\'t find any requirements. Put each one on its own line, ideally starting with a dash.'; render(); return; }
-    UI.buildWarn = ''; UI.draftBrief = null;
-    S.campaign = {id: (S.campaign && S.campaign.id) || uid('c'), title: titleOf(text), brief: text, items, builtBy, createdAt: (S.campaign && S.campaign.createdAt) || Date.now()};
-    await saveCampaign(); location.hash = '#checklist';
-  }
-  if(act === 'rmterm'){ const it = item(id); it.terms.splice(+b.dataset.i, 1); await saveCampaign(); UI.refocus = `.addterm[data-id="${id}"]`; render(); }
-  if(act === 'rmitem'){ S.campaign.items = S.campaign.items.filter(i => i.id !== id); await saveCampaign(); render(); toast('Line removed'); }
-  if(act === 'copy'){
-    const url = linkFor(id);
-    try{ await navigator.clipboard.writeText(url); toast('Link copied'); }
-    catch(err){ prompt('Copy this link', url); }
-  }
+  if(act === 'build') build(document.getElementById('brief').value, false);
+  if(act === 'rebuild') build(document.getElementById('brief').value, true);
+  if(act === 'wizback'){ UI.wizStep = S.campaign.setup === 'creators' ? 'checklist' : 'brief'; if(UI.wizStep === 'checklist'){ S.campaign.setup = 'checklist'; await save(); UI.wizStep = null; } render(); scrollTo(0, 0); }
+  if(act === 'wiznext'){ S.campaign.setup = b.dataset.to; UI.wizStep = null; await save(); if(b.dataset.to === 'done') location.hash = '#overview'; render(); scrollTo(0, 0); }
+  if(act === 'editopen'){ UI.editing = id; UI.adding = null; UI.refocus = '#edittext'; render(); }
+  if(act === 'editcancel'){ UI.editing = null; render(); }
+  if(act === 'editsave'){ const t = document.getElementById('edittext').value.trim(), it = item(id); if(t){ it.text = t; it.terms = termsFor(t, it.kind); await save(); } UI.editing = null; render(); }
+  if(act === 'move'){ const it = item(id); it.kind = b.dataset.kind; it.terms = termsFor(it.text, it.kind); await save(); render(); toast(`Moved to ${KINDS[it.kind].name}`); }
+  if(act === 'rmitem'){ S.campaign.items = S.campaign.items.filter(i => i.id !== id); await save(); render(); toast('Requirement deleted', 'trash'); }
+  if(act === 'addopen'){ UI.adding = b.dataset.kind; UI.editing = null; UI.refocus = '#addtext'; render(); }
+  if(act === 'addcancel'){ UI.adding = null; render(); }
+  if(act === 'addsave'){ const t = document.getElementById('addtext').value.trim(); if(t){ S.campaign.items.push({id: uid('i'), text: t, kind: b.dataset.kind, terms: termsFor(t, b.dataset.kind)}); await save(); } UI.adding = null; render(); }
+  if(act === 'briefedit'){ UI.briefEdit = true; render(); }
+  if(act === 'briefcancel'){ UI.briefEdit = false; UI.draftBrief = null; UI.warn = ''; render(); }
+
+  // creators
+  if(act === 'copy') copyLink(id);
+  if(act === 'addopenc'){ UI.addOpen = true; UI.refocus = '#cname'; render(); }
+  if(act === 'addclose'){ UI.addOpen = false; render(); }
   if(act === 'reset'){
-    if(!confirm('Start over? This clears the campaign, creators and reels saved in this browser.')) return;
-    await api.reset(); vids.clear(); UI.draftBrief = null; location.hash = '#brief'; render();
+    if(!confirm('Start a new campaign? This clears the current campaign, creators and reels saved in this browser.')) return;
+    await api.reset(); vids.clear(); Object.assign(UI, {draftBrief:null, wizStep:null, warn:''}); location.hash = ''; render();
   }
-  if(act === 'more'){ UI.more = !UI.more; render(); }
 
   // review
-  const [, rcid, rn] = location.hash.slice(1).split('/');
-  const rv = () => { const v = version(rcid, rn ? +rn : latest(rcid).n); v.review = v.review || {changes:{}, overrides:{}, decision:null}; return v; };
-  if(act === 'askopen'){ UI.ask = id; render(); UI.refocus = '#asktext'; hydrate(); }
+  if(act === 'more'){ UI.more = !UI.more; render(); }
+  if(act === 'askopen'){ UI.ask = id; UI.refocus = '#asktext'; render(); }
   if(act === 'askcancel'){ UI.ask = null; render(); }
   if(act === 'asksave' || act === 'askremove'){
-    const v = rv(), note = act === 'asksave' ? document.getElementById('asktext').value.trim() : '';
+    const {cid, v} = reviewTarget(), note = act === 'asksave' ? document.getElementById('asktext').value.trim() : '';
     if(note) v.review.changes[id] = {note, text: item(id).text}; else delete v.review.changes[id];
-    UI.ask = null; await api.review(rcid, v.n, v.review); render();
+    UI.ask = null; await api.review(cid, v.n, v.review); render();
   }
   if(act === 'ov'){
-    const v = rv();
+    const {cid, v} = reviewTarget();
     if(b.dataset.v) v.review.overrides[id] = b.dataset.v; else delete v.review.overrides[id];
-    await api.review(rcid, v.n, v.review); render();
+    await api.review(cid, v.n, v.review); render();
   }
   if(act === 'sendreview'){
-    const v = rv(), k = Object.keys(v.review.changes).length;
+    const {cid, v} = reviewTarget(), k = Object.keys(v.review.changes).length;
     v.review.decision = k ? 'changes' : 'approved'; v.review.at = Date.now();
-    await api.review(b.dataset.id, v.n, v.review); render();
-    toast(k ? `Sent to ${creator(b.dataset.id).name}` : `Version ${v.n} approved`);
+    await api.review(cid, v.n, v.review); render();
+    toast(k ? `Sent to ${creator(cid).name}` : 'Reel approved');
   }
 
   // creator
@@ -967,64 +1264,60 @@ document.addEventListener('click', async e => {
   if(act === 'edit'){ CR.screen = 'form'; render(); scrollTo(0, 0); }
   if(act === 'newversion'){ CR.draft = null; CR.screen = 'form'; render(); scrollTo(0, 0); }
   if(act === 'send'){
-    const d = CR.draft;
-    b.disabled = true;
+    const d = CR.draft; b.disabled = true;
     if(d.file) await vids.put(`${CID}#${CR.n}`, d.file, d.url);
-    await api.submit(CID, {n: CR.n, caption: d.caption, script: d.script, ticks: {...d.ticks}, hasVideo: !!d.file, sentAt: Date.now()});
+    await api.submit(CID, {n: CR.n, caption: d.caption, script: d.script, ticks: {...d.ticks}, results: CR.results, checkedBy: CR.by, hasVideo: !!d.file, sentAt: Date.now()});
     CR.draft = null; CR.screen = 'sent'; render(); scrollTo(0, 0);
   }
 });
 
+function setFile(f){
+  if(!f || !CR.draft) return;
+  if(CR.draft.url) URL.revokeObjectURL(CR.draft.url);
+  CR.draft.file = f; CR.draft.url = URL.createObjectURL(f); CR.warn = ''; render();
+}
 document.addEventListener('input', e => {
   const t = e.target;
   if(t.tagName === 'TEXTAREA') grow(t);
   if(t.id === 'brief') UI.draftBrief = t.value;
   if(t.dataset.draft && CR.draft) CR.draft[t.dataset.draft] = t.value;
 });
-document.addEventListener('change', async e => {
+document.addEventListener('change', e => {
   const t = e.target, act = t.dataset.act;
-  if(act === 'kind'){ const it = item(t.dataset.id); it.kind = t.value; if(t.value !== 'manual' && !it.terms.length) it.terms = termsFor(it.text, t.value); await saveCampaign(); render(); }
   if(act === 'tick' && CR.draft) CR.draft.ticks[t.dataset.id] = t.checked;
-  if(act === 'file'){
-    const f = t.files[0]; if(!f) return;
-    if(CR.draft.url) URL.revokeObjectURL(CR.draft.url);
-    CR.draft.file = f; CR.draft.url = URL.createObjectURL(f); CR.warn = ''; render();
-  }
+  if(act === 'file') setFile(t.files[0]);
 });
-document.addEventListener('keydown', async e => {
+document.addEventListener('dragover', e => { const d = e.target.closest && e.target.closest('[data-drop]'); if(d){ e.preventDefault(); d.classList.add('over'); } });
+document.addEventListener('dragleave', e => { const d = e.target.closest && e.target.closest('[data-drop]'); if(d) d.classList.remove('over'); });
+document.addEventListener('drop', e => { const d = e.target.closest && e.target.closest('[data-drop]'); if(d){ e.preventDefault(); setFile(e.dataTransfer.files[0]); } });
+document.addEventListener('keydown', e => {
   const t = e.target;
-  if(t.classList && t.classList.contains('addterm')){
-    if(e.key === 'Enter' || e.key === ','){
-      e.preventDefault();
-      const it = item(t.dataset.id), vals = t.value.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
-      if(!vals.length) return;
-      it.terms = [...new Set([...it.terms, ...vals])];
-      await saveCampaign(); UI.refocus = `.addterm[data-id="${it.id}"]`; render();
-    }
-    if(e.key === 'Backspace' && !t.value){
-      const it = item(t.dataset.id); if(!it.terms.length) return;
-      it.terms.pop(); await saveCampaign(); UI.refocus = `.addterm[data-id="${it.id}"]`; render();
-    }
+  if(e.key === 'Enter' && !e.shiftKey){
+    if(t.id === 'edittext'){ e.preventDefault(); document.querySelector('[data-act=editsave]').click(); }
+    if(t.id === 'addtext'){ e.preventDefault(); document.querySelector('[data-act=addsave]').click(); }
   }
-  if(e.key === 'Escape' && UI.ask){ UI.ask = null; render(); }
+  if(e.key === 'Escape'){
+    document.querySelectorAll('details.menu[open]').forEach(m => m.open = false);
+    if(UI.ask || UI.editing || UI.adding){ UI.ask = UI.editing = UI.adding = null; render(); }
+  }
 });
-document.addEventListener('submit', async e => {
+document.addEventListener('submit', e => {
   if(e.target.dataset.form !== 'creator') return;
   e.preventDefault();
-  const inp = document.getElementById('cname'), name = inp.value.trim();
+  const inp = e.target.querySelector('#cname'), name = inp.value.trim();
   if(!name){ inp.focus(); return; }
-  await api.registerCreator(name); UI.refocus = '#cname'; render(); toast(`${name} added`);
+  addCreator(name);
 });
-addEventListener('hashchange', () => { UI.ask = null; UI.more = false; render(); scrollTo(0, 0); });
+addEventListener('hashchange', () => { Object.assign(UI, {ask:null, more:false, editing:null, adding:null, briefEdit:false, addOpen:false}); render(); scrollTo(0, 0); });
 
-/* Other tabs (the creator's link, the brand's screen) write to the same
-   storage. Pick up their changes live, but never under someone's cursor. */
+/* The brand's tab and the creator's tab share storage: pick up the other
+   side's changes live, but never under someone's cursor. */
 let stale = false;
 function refresh(){
   const a = document.activeElement;
-  if(a && /^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName) || UI.ask || CR.screen === 'checking'){ stale = true; return; }
+  if((a && /^(TEXTAREA|INPUT)$/.test(a.tagName)) || UI.ask || UI.editing || UI.busy || CR.screen === 'checking'){ stale = true; return; }
   stale = false;
-  api.load(CAMP).then(() => {
+  api.load().then(() => {
     if(MODE_CREATOR && CR.screen === 'sent') CR.screen = creatorDefault();
     const y = scrollY; render(); scrollTo(0, y);
   });
@@ -1032,7 +1325,7 @@ function refresh(){
 addEventListener('storage', e => { if(e.key === KEY) refresh(); });
 document.addEventListener('focusout', () => setTimeout(() => { if(stale) refresh(); }, 0));
 
-api.load(CAMP).then(render, () => render());
+render();
 </script>
 </body>
 </html>

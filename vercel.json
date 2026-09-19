@@ -1,1 +1,1 @@
-{ "functions": { "api/checklist.py": { "maxDuration": 60 } } }
+{ "functions": { "api/ai.py": { "maxDuration": 60 } } }
